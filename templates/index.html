@@ -7,16 +7,18 @@
     <link href="/static/css/output.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
-<body class="bg-pizza-beige font-body">
+<body class="min-h-screen relative">
+<!-- This div creates the gradient background -->
+<div class="gradient-background fixed inset-0 -z-10"></div>
+
 {{ template "header" . }}
 
 <main>
-    <section class="py-20 bg-cover bg-center" style="background-image: url('/static/images/pizza-hero.jpg')">
+    <section class="py-20 bg-cover bg-center relative" style="background-image: url('/static/images/catamaran.jpg')">
         <div class="container mx-auto px-6">
-            <div class="max-w-lg bg-white bg-opacity-90 p-8 rounded-lg">
+            <div class="max-w-lg gradient-background text-black p-8 rounded-lg shadow-lg">
                 <h1 class="text-4xl font-display font-bold mb-4">Benvenuti!</h1>
                 <p class="mb-6">
-
                     Wir freuen uns, Sie hier begrüßen zu dürfen.
 
                     Schauen Sie sich um, holen Sie sich Appetit, besuchen Sie uns und genießen Sie unsere italienische und deutsche Küche. Oder bestellen Sie einfach telefonisch und genießen unsere Speisen zuhause.
@@ -27,10 +29,11 @@
                 </p>
                 <a href="/order" class="btn-primary">Order Now</a>
             </div>
+
         </div>
     </section>
 
-    <section class="py-12 bg-white">
+    <section class="py-12 bg-transparent">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-display font-bold text-center mb-8">Our Specialties</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
