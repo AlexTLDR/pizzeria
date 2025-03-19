@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <link href="/static/css/output.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-pizza-beige font-body">
+{{ template "header" . }}
+
+<main>
+    <section class="py-20 bg-cover bg-center" style="background-image: url('/static/images/pizza-hero.jpg')">
+        <div class="container mx-auto px-6">
+            <div class="max-w-lg bg-white bg-opacity-90 p-8 rounded-lg">
+                <h1 class="text-4xl font-display font-bold mb-4">Benvenuti!</h1>
+                <p class="mb-6">
+
+                    Wir freuen uns, Sie hier begrüßen zu dürfen.
+
+                    Schauen Sie sich um, holen Sie sich Appetit, besuchen Sie uns und genießen Sie unsere italienische und deutsche Küche. Oder bestellen Sie einfach telefonisch und genießen unsere Speisen zuhause.
+
+                    Sprechen Sie uns an, wenn Sie eine Feier oder eine Festlichkeit planen.
+
+                    Ihre Familie Petra und Gianni Pilia
+                </p>
+                <a href="/order" class="btn-primary">Order Now</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-6">
+            <h2 class="text-3xl font-display font-bold text-center mb-8">Our Specialties</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <img src="/static/images/pizza-icon.svg" alt="Pizza" class="w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-xl font-bold mb-2">Wood-Fired Pizza</h3>
+                    <p>Crispy, thin crust pizzas baked in our authentic wood-fired oven.</p>
+                </div>
+                <div class="text-center">
+                    <img src="/static/images/pasta-icon.svg" alt="Pasta" class="w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-xl font-bold mb-2">Homemade Pasta</h3>
+                    <p>Fresh pasta made daily with the finest ingredients.</p>
+                </div>
+                <div class="text-center">
+                    <img src="/static/images/wine-icon.svg" alt="Wine" class="w-24 h-24 mx-auto mb-4">
+                    <h3 class="text-xl font-bold mb-2">Italian Wines</h3>
+                    <p>Curated selection of wines from Italy's finest vineyards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+{{ template "footer" . }}
+</body>
+</html>

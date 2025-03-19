@@ -1,0 +1,34 @@
+{
+  "name": "pizzeria",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css",
+    "watch-css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
+    "build-go": "go build -o bin/server ./cmd/server",
+    "dev": "concurrently \"npm run watch-css\" \"go run ./cmd/server/main.go\"",
+    "start": "npm run build-css && npm run build-go && ./bin/server",
+    "clean": "rm -rf bin static/css/output.css"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexTLDR/pizzeria.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/AlexTLDR/pizzeria/issues"
+  },
+  "homepage": "https://github.com/AlexTLDR/pizzeria#readme",
+  "devDependencies": {
+    "tailwindcss": "^4.0.14",
+    "concurrently": "^8.2.0"
+  },
+  "dependencies": {
+    "@tailwindcss/cli": "^4.0.14"
+  }
+}

@@ -1,0 +1,33 @@
+{{ define "footer" }}
+<footer class="bg-gray-800 text-white py-8">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between">
+            <div class="mb-6 md:mb-0">
+                <h3 class="text-xl font-bold mb-4">Pizzeria Ristorante
+                    La piccola Sardegna</h3>
+                <p>Petra und Gianni Pilia<br>Erlenäcker 4<br>73577 Ruppertshofen</p>
+            </div>
+            <div class="mb-6 md:mb-0">
+                <h3 class="text-xl font-bold mb-4">Öffnungszeiten</h3>
+                <div class="grid grid-cols-[auto_1fr] gap-x-4">
+                    <div>Montag:</div>
+                    <div>Ruhetag</div>
+                    <div>Dienstag - Samstag:</div>
+                    <div>17:00 - 22:00 Uhr</div>
+                    <div>Sonntag:</div>
+                    <div>11:30 - 14:00 Uhr<br>17:00 - 21:30 Uhr</div>
+                </div>
+            </div>
+            <div>
+                <h3 class="text-xl font-bold mb-4">Contact</h3>
+                <p>Telefon: 07176 2122<br>
+                    Email: gianni2110.gp@gmail.com</p>
+            </div>
+        </div>
+        <div class="mt-8 text-center">
+            <p>&copy; {{ .Year }} Pizzeria Ristorante
+                La piccola Sardegna. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+{{ end }}
