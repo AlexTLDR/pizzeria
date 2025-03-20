@@ -240,11 +240,17 @@
   .sticky {
     position: sticky;
   }
+  .inset-0 {
+    inset: calc(var(--spacing) * 0);
+  }
   .isolate {
     isolation: isolate;
   }
   .isolation-auto {
     isolation: auto;
+  }
+  .-z-10 {
+    z-index: calc(10 * -1);
   }
   .z-auto {
     z-index: auto;
@@ -1944,6 +1950,29 @@
     @media (width >= 64rem) {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
+  }
+}
+@layer components {
+  .gradient-background {
+    background: linear-gradient(300deg, #0077b6, #00b4d8, #48cae4);
+    background-size: 180% 180%;
+    animation: gradient 18s ease infinite;
+  }
+}
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+@layer utilities {
+  .animate-gradient {
+    animation: gradient 18s ease infinite;
   }
 }
 @property --tw-translate-x {
