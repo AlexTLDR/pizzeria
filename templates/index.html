@@ -8,51 +8,49 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body class="min-h-screen relative">
-<!-- This div creates the gradient background -->
+<!-- Gradient Background -->
 <div class="gradient-background fixed inset-0 -z-10"></div>
 
 {{ template "header" . }}
 
 <main>
-    <section class="py-20 bg-cover bg-center relative" style="background-image: url('/static/images/catamaran.jpg')">
-        <div class="container mx-auto px-6">
-            <div class="max-w-lg gradient-background text-black p-8 rounded-lg shadow-lg">
-                <h1 class="text-4xl font-display font-bold mb-4">Benvenuti!</h1>
-                <p class="mb-6">
-                    Wir freuen uns, Sie hier begrüßen zu dürfen.
-
-                    Schauen Sie sich um, holen Sie sich Appetit, besuchen Sie uns und genießen Sie unsere italienische und deutsche Küche. Oder bestellen Sie einfach telefonisch und genießen unsere Speisen zuhause.
-
-                    Sprechen Sie uns an, wenn Sie eine Feier oder eine Festlichkeit planen.
-
-                    Ihre Familie Petra und Gianni Pilia
-                </p>
-                <a href="/order" class="btn-primary">Order Now</a>
-            </div>
-
+    <!-- Announcement Banner -->
+    <section class="py-6 bg-red-600 text-white">
+        <div class="container mx-auto px-6 text-center">
+            <h2 class="text-2xl font-display font-bold">Dienstag Pizza Tag!</h2>
+            <p class="mt-2">Jeden Dienstag alle Pizzen zum Sonderpreis. Besuchen Sie uns oder bestellen Sie telefonisch!</p>
         </div>
     </section>
 
+    <!-- Menu Section -->
     <section class="py-12 bg-transparent">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-display font-bold text-center mb-8">Our Specialties</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <img src="/static/images/pizza-icon.svg" alt="Pizza" class="w-24 h-24 mx-auto mb-4">
-                    <h3 class="text-xl font-bold mb-2">Wood-Fired Pizza</h3>
-                    <p>Crispy, thin crust pizzas baked in our authentic wood-fired oven.</p>
-                </div>
-                <div class="text-center">
-                    <img src="/static/images/pasta-icon.svg" alt="Pasta" class="w-24 h-24 mx-auto mb-4">
-                    <h3 class="text-xl font-bold mb-2">Homemade Pasta</h3>
-                    <p>Fresh pasta made daily with the finest ingredients.</p>
-                </div>
-                <div class="text-center">
-                    <img src="/static/images/wine-icon.svg" alt="Wine" class="w-24 h-24 mx-auto mb-4">
-                    <h3 class="text-xl font-bold mb-2">Italian Wines</h3>
-                    <p>Curated selection of wines from Italy's finest vineyards.</p>
-                </div>
+            <h2 class="text-3xl font-display font-bold text-center mb-8">Our Menu</h2>
+
+            <!-- Menu Categories -->
+            <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <a href="#antipasti" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Antipasti</a>
+                <a href="#insalate" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Insalate</a>
+                <a href="#pizza" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Pizza</a>
+                <a href="#spaghetti" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Spaghetti</a>
+                <a href="#penne" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Penne</a>
+                <a href="#rigatoni" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Rigatoni</a>
+                <a href="#pasta-al-forno" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Pasta al Forno</a>
+                <a href="#pesce" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Pesce Fritto</a>
+                <a href="#carne" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Carne</a>
             </div>
+
+            <!-- Include sections dynamically -->
+            {{ template "menu-section" (dict "ID" "antipasti" "Title" "Antipasti / Vorspeisen" "Image" "/static/images/antipasti-bruschetta.jpg" "Name" "Bruschetta" "Desc" "Pane tostato, pomodoro, aglio, basilico, olio d'oliva" "Price" "5,00 €") }}
+            {{ template "menu-section" (dict "ID" "insalate" "Title" "Insalate / Salate" "Image" "/static/images/salad-caesar.jpg" "Name" "Insalata Caesar" "Desc" "Lattuga romana, crostini, parmigiano, salsa Caesar" "Price" "6,00 €") }}
+            {{ template "menu-section" (dict "ID" "pizza" "Title" "Pizza" "Image" "/static/images/pizza-margherita.jpg" "Name" "Pizza Margherita" "Desc" "Pomodoro, mozzarella, basilico fresco" "Price" "From 7,90 €") }}
+            {{ template "menu-section" (dict "ID" "spaghetti" "Title" "Spaghetti" "Image" "/static/images/pasta-carbonara.jpg" "Name" "Spaghetti Carbonara" "Desc" "Spaghetti, uova, pecorino, pancetta, pepe nero" "Price" "7,00 €") }}
+            {{ template "menu-section" (dict "ID" "penne" "Title" "Penne" "Image" "/static/images/pasta-arrabbiata.jpg" "Name" "Penne all'Arrabbiata" "Desc" "Penne, pomodoro, aglio, peperoncino, prezzemolo" "Price" "6,50 €") }}
+            {{ template "menu-section" (dict "ID" "rigatoni" "Title" "Rigatoni" "Image" "/static/images/pasta-amatriciana.jpg" "Name" "Rigatoni all'Amatriciana" "Desc" "Rigatoni, guanciale, pomodoro, pecorino, peperoncino" "Price" "6,80 €") }}
+            {{ template "menu-section" (dict "ID" "pasta-al-forno" "Title" "Pasta al Forno / Nudelgerichte überbacken" "Image" "/static/images/pasta-lasagna.jpg" "Name" "Lasagna al Forno" "Desc" "Pasta, ragù di carne, besciamella, parmigiano" "Price" "7,60 €") }}
+            {{ template "menu-section" (dict "ID" "pesce" "Title" "Pesce Fritto / Fisch fritiert" "Image" "/static/images/pesce-calamari.jpg" "Name" "Calamari Fritti" "Desc" "Calamari, farina, limone, salsa tartara" "Price" "9,00 €") }}
+            {{ template "menu-section" (dict "ID" "carne" "Title" "Carne / Fleisch" "Image" "/static/images/carne-scaloppine.jpg" "Name" "Scaloppine al Limone" "Desc" "Kalbfleischscheiben, Zitronensauce, Petersilie" "Price" "10,50 €") }}
+
         </div>
     </section>
 </main>

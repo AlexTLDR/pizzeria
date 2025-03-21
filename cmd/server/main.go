@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -14,6 +15,24 @@ type MenuItem struct {
 	Price       float64
 	Category    string
 	ImageURL    string
+}
+
+// Template function map with the dict function
+var funcMap = template.FuncMap{
+	"dict": func(values ...interface{}) (map[string]interface{}, error) {
+		if len(values)%2 != 0 {
+			return nil, fmt.Errorf("invalid dict call")
+		}
+		dict := make(map[string]interface{}, len(values)/2)
+		for i := 0; i < len(values); i += 2 {
+			key, ok := values[i].(string)
+			if !ok {
+				return nil, fmt.Errorf("dict keys must be strings")
+			}
+			dict[key] = values[i+1]
+		}
+		return dict, nil
+	},
 }
 
 func main() {
@@ -30,46 +49,89 @@ func main() {
 
 	// Home page
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles(
+		// Create a template with the function map
+		tmpl := template.New("").Funcs(funcMap)
+
+		// Parse the template files
+		tmpl, err := tmpl.ParseFiles(
 			"templates/header.html",
 			"templates/footer.html",
+			"templates/menu-section.html",
 			"templates/index.html",
-		))
+		)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		// Execute the index.html template specifically
-		tmpl.ExecuteTemplate(w, "index.html", map[string]interface{}{
+		err = tmpl.ExecuteTemplate(w, "index.html", map[string]interface{}{
 			"Title": "Pizzeria Ristorante - Authentic Italian Cuisine",
 			"Year":  time.Now().Year(),
 		})
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	})
 
 	// Menu page
 	http.HandleFunc("/menu", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles(
+		// Create a template with the function map
+		tmpl := template.New("").Funcs(funcMap)
+
+		// Parse the template files
+		tmpl, err := tmpl.ParseFiles(
 			"templates/header.html",
 			"templates/footer.html",
 			"templates/menu.html",
-		))
+		)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		// Execute the menu.html template specifically
-		tmpl.ExecuteTemplate(w, "menu.html", map[string]interface{}{
+		err = tmpl.ExecuteTemplate(w, "menu.html", map[string]interface{}{
 			"Title": "Our Menu - Pizzeria Ristorante La piccola Sardegna",
 			"Menu":  pizzaMenu,
 			"Year":  time.Now().Year(),
 		})
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	})
 
 	// Order page
 	http.HandleFunc("/order", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := template.Must(template.ParseFiles(
+		// Create a template with the function map
+		tmpl := template.New("").Funcs(funcMap)
+
+		// Parse the template files
+		tmpl, err := tmpl.ParseFiles(
 			"templates/header.html",
 			"templates/footer.html",
 			"templates/order.html",
-		))
+		)
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 		// Execute the order.html template specifically
-		tmpl.ExecuteTemplate(w, "order.html", map[string]interface{}{
+		err = tmpl.ExecuteTemplate(w, "order.html", map[string]interface{}{
 			"Title": "Order Online - Pizzeria Ristorante La piccola Sardegna",
 			"Menu":  pizzaMenu,
 			"Year":  time.Now().Year(),
 		})
+
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 	})
 
 	log.Println("Server starting on http://localhost:8080")
