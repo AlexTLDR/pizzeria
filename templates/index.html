@@ -5,10 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .Title }}</title>
     <link href="/static/css/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         .found-item {
             animation: highlight 3s;
+        }
+        .font-garamond {
+            font-family: 'EB Garamond', serif;
         }
 
         @keyframes highlight {
@@ -27,20 +31,21 @@
 
 <main>
     <!-- Announcement Banner -->
-    <section class="py-6 bg-red-600 text-white">
+    <section class="py-6 bg-red-600">
         <div class="container mx-auto px-6 text-center">
-            <h2 class="text-2xl font-display font-bold">Dienstag Pizza Tag!</h2>
-            <p class="mt-2">Jeden Dienstag alle Pizzen zum Sonderpreis. Besuchen Sie uns oder bestellen Sie telefonisch!</p>
+            <h2 class="text-2xl font-display font-bold text-black">Dienstag Pizza Tag!</h2>
+            <p class="mt-2 text-black">
+                Auf unserer Speisekarte stehen am Dienstag
+                nur Pizzen und Salate.
+            </p>
         </div>
     </section>
 
+    {{ template "category-nav" . }}
     <!-- Menu Section -->
     <section class="py-12 bg-transparent">
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-display font-bold text-center mb-8">Our Menu</h2>
-
-            <!-- Include the category navigation -->
-            {{ template "category-nav" . }}
 
             <!-- Menu Categories -->
             <div id="antipasti" class="mb-12 pt-4">

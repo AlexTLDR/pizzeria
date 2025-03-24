@@ -1,36 +1,54 @@
 {{ define "category-nav" }}
-<div class="mb-8">
-    <!-- Search bar -->
-    <div class="max-w-md mx-auto mb-6">
-        <form id="menuSearchForm" class="flex items-center">
-            <input type="text" id="menuSearchInput" placeholder="Search our menu..."
-                   class="w-full p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-pizza-red">
-            <button type="submit" class="bg-pizza-red text-white p-3 rounded-r-lg hover:bg-red-700 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </button>
-        </form>
-    </div>
+<div class="bg-gray-800 text-white py-3 sticky top-0 z-10 shadow-md">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-wrap items-center justify-center gap-4">
+            <!-- Improved search form -->
+            <form id="menuSearchForm" class="flex items-center order-first mr-3">
+                <div class="relative">
+                    <input type="text" id="menuSearchInput" placeholder="Search menu..."
+                           class="w-40 py-1.5 pl-9 pr-3 text-sm text-white bg-transparent border border-white/30 rounded-full focus:outline-none focus:border-white/70 focus:ring-1 focus:ring-white/70 placeholder-white/70">
+                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                    </div>
+                </div>
+                <button type="submit" class="hidden">Search</button>
+            </form>
 
-    <!-- Category buttons -->
-    <div class="flex flex-wrap justify-center gap-3 py-2">
-        <a href="#antipasti" class="category-btn">Antipasti</a>
-        <a href="#insalate" class="category-btn">Insalate</a>
-        <a href="#pizza" class="category-btn">Pizza</a>
-        <a href="#spaghetti" class="category-btn">Spaghetti</a>
-        <a href="#penne" class="category-btn">Penne</a>
-        <a href="#rigatoni" class="category-btn">Rigatoni</a>
-        <a href="#pasta-al-forno" class="category-btn">Pasta al Forno</a>
-        <a href="#pesce" class="category-btn">Pesce Fritto</a>
-        <a href="#carne" class="category-btn">Carne</a>
+            <!-- Category buttons with more spacing -->
+            <a href="#antipasti" class="category-btn mx-1">Antipasti</a>
+            <a href="#insalate" class="category-btn mx-1">Insalate</a>
+            <a href="#pizza" class="category-btn mx-1">Pizza</a>
+            <a href="#spaghetti" class="category-btn mx-1">Spaghetti</a>
+            <a href="#penne" class="category-btn mx-1">Penne</a>
+            <a href="#rigatoni" class="category-btn mx-1">Rigatoni</a>
+            <a href="#pasta-al-forno" class="category-btn mx-1">Pasta al Forno</a>
+            <a href="#pesce" class="category-btn mx-1">Pesce</a>
+            <a href="#carne" class="category-btn mx-1">Carne</a>
+        </div>
     </div>
 </div>
 
 <style>
     .category-btn {
-        @apply px-4 py-2 bg-white border border-pizza-red text-pizza-red rounded-full font-medium
-        hover:bg-pizza-red hover:text-white transition-colors shadow-sm;
+        display: inline-block;
+        padding: 0.375rem 0.75rem;
+        background-color: transparent;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-align: center;
+        transition: all 0.2s ease;
+        margin: 0.25rem;
+    }
+
+    .category-btn:hover, .category-btn.active {
+        background-color: #dc2626;
+        color: white;
+        border-color: #dc2626;
     }
 </style>
 
@@ -39,10 +57,34 @@
         const searchForm = document.getElementById('menuSearchForm');
         const searchInput = document.getElementById('menuSearchInput');
 
-        // Search functionality
+        // Highlight the current section when scrolling
+        const categoryLinks = document.querySelectorAll('.category-btn');
+        const sections = document.querySelectorAll('[id^="antipasti"], [id^="insalate"], [id^="pizza"], [id^="spaghetti"], [id^="penne"], [id^="rigatoni"], [id^="pasta-al-forno"], [id^="pesce"], [id^="carne"]');
+
+        window.addEventListener('scroll', function() {
+            let current = '';
+
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            categoryLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Search functionality - only triggered when form is submitted (Enter key)
         searchForm.addEventListener('submit', function(e) {
             e.preventDefault();
             const searchTerm = searchInput.value.toLowerCase();
+
+            if (searchTerm.trim() === '') return;
 
             // Find all menu items
             const menuItems = document.querySelectorAll('.menu-item');
@@ -69,7 +111,7 @@
             }
 
             if (!found) {
-                alert('No menu items found matching "' + searchTerm + '"');
+                searchInput.value = '';
             }
         });
     });
