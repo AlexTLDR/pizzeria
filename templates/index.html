@@ -21,6 +21,11 @@
             80% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 1); }
             100% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0); }
         }
+        .spacer-32 {
+            height: 32px !important;
+            min-height: 32px !important;
+            display: block !important;
+        }
     </style>
 </head>
 <body class="min-h-screen relative">
@@ -40,7 +45,7 @@
             </p>
         </div>
     </section>
-
+    <div class="spacer-32"></div>
     {{ template "category-nav" . }}
     <!-- Menu Section -->
     <section class="py-12 bg-transparent">

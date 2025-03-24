@@ -1,11 +1,12 @@
 {{ define "category-nav" }}
-<div class="bg-gray-800 text-white py-3 sticky top-0 z-10 shadow-md">
+<div class="bg-gray-800 text-white py-3 sticky top-0 z-10 shadow-md mt-4">
     <div class="container mx-auto px-6">
         <div class="flex flex-wrap items-center justify-center gap-4">
-            <!-- Improved search form -->
+            <!-- Search form with styling to match buttons -->
             <form id="menuSearchForm" class="flex items-center order-first mr-3">
                 <div class="relative">
-                    <input type="text" id="menuSearchInput" placeholder="Search menu..."
+                    <input type="text" id="menuSearchInput" placeholder="  🔍 Suchmenü..."
+                           style="border-radius: 9999px !important; overflow: hidden !important; border-width: 1px !important; text-indent: 1rem;"
                            class="w-40 py-1.5 pl-9 pr-3 text-sm text-white bg-transparent border border-white/30 rounded-full focus:outline-none focus:border-white/70 focus:ring-1 focus:ring-white/70 placeholder-white/70">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -31,6 +32,16 @@
 </div>
 
 <style>
+    /* Match search input styling to buttons */
+    #menuSearchInput {
+        border-radius: 9999px !important;
+        overflow: hidden !important;
+        border-width: 1px !important;
+        padding-top: 0.375rem !important;
+        padding-bottom: 0.375rem !important;
+        font-weight: 500 !important;
+    }
+
     .category-btn {
         display: inline-block;
         padding: 0.375rem 0.75rem;
