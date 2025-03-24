@@ -6,6 +6,18 @@
     <title>{{ .Title }}</title>
     <link href="/static/css/output.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        .found-item {
+            animation: highlight 3s;
+        }
+
+        @keyframes highlight {
+            0% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0); }
+            20% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 1); }
+            80% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 1); }
+            100% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0); }
+        }
+    </style>
 </head>
 <body class="min-h-screen relative">
 <!-- Gradient Background -->
@@ -27,30 +39,189 @@
         <div class="container mx-auto px-6">
             <h2 class="text-3xl font-display font-bold text-center mb-8">Our Menu</h2>
 
+            <!-- Include the category navigation -->
+            {{ template "category-nav" . }}
+
             <!-- Menu Categories -->
-            <div class="flex flex-wrap justify-center gap-4 mb-10">
-                <a href="#antipasti" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Antipasti</a>
-                <a href="#insalate" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Insalate</a>
-                <a href="#pizza" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Pizza</a>
-                <a href="#spaghetti" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Spaghetti</a>
-                <a href="#penne" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Penne</a>
-                <a href="#rigatoni" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Rigatoni</a>
-                <a href="#pasta-al-forno" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Pasta al Forno</a>
-                <a href="#pesce" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Pesce Fritto</a>
-                <a href="#carne" class="px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition">Carne</a>
+            <div id="antipasti" class="mb-12 pt-4">
+                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Antipasti / Vorspeisen</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{ range .Menu }}
+                    {{ if eq .Category "Antipasti" }}
+                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
+                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ .Description }}</p>
+                        </div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
             </div>
 
-            <!-- Include sections dynamically -->
-            {{ template "menu-section" (dict "ID" "antipasti" "Title" "Antipasti / Vorspeisen" "Image" "/static/images/antipasti-bruschetta.jpg" "Name" "Bruschetta" "Desc" "Pane tostato, pomodoro, aglio, basilico, olio d'oliva" "Price" "5,00 €") }}
-            {{ template "menu-section" (dict "ID" "insalate" "Title" "Insalate / Salate" "Image" "/static/images/salad-caesar.jpg" "Name" "Insalata Caesar" "Desc" "Lattuga romana, crostini, parmigiano, salsa Caesar" "Price" "6,00 €") }}
-            {{ template "menu-section" (dict "ID" "pizza" "Title" "Pizza" "Image" "/static/images/pizza-margherita.jpg" "Name" "Pizza Margherita" "Desc" "Pomodoro, mozzarella, basilico fresco" "Price" "From 7,90 €") }}
-            {{ template "menu-section" (dict "ID" "spaghetti" "Title" "Spaghetti" "Image" "/static/images/pasta-carbonara.jpg" "Name" "Spaghetti Carbonara" "Desc" "Spaghetti, uova, pecorino, pancetta, pepe nero" "Price" "7,00 €") }}
-            {{ template "menu-section" (dict "ID" "penne" "Title" "Penne" "Image" "/static/images/pasta-arrabbiata.jpg" "Name" "Penne all'Arrabbiata" "Desc" "Penne, pomodoro, aglio, peperoncino, prezzemolo" "Price" "6,50 €") }}
-            {{ template "menu-section" (dict "ID" "rigatoni" "Title" "Rigatoni" "Image" "/static/images/pasta-amatriciana.jpg" "Name" "Rigatoni all'Amatriciana" "Desc" "Rigatoni, guanciale, pomodoro, pecorino, peperoncino" "Price" "6,80 €") }}
-            {{ template "menu-section" (dict "ID" "pasta-al-forno" "Title" "Pasta al Forno / Nudelgerichte überbacken" "Image" "/static/images/pasta-lasagna.jpg" "Name" "Lasagna al Forno" "Desc" "Pasta, ragù di carne, besciamella, parmigiano" "Price" "7,60 €") }}
-            {{ template "menu-section" (dict "ID" "pesce" "Title" "Pesce Fritto / Fisch fritiert" "Image" "/static/images/pesce-calamari.jpg" "Name" "Calamari Fritti" "Desc" "Calamari, farina, limone, salsa tartara" "Price" "9,00 €") }}
-            {{ template "menu-section" (dict "ID" "carne" "Title" "Carne / Fleisch" "Image" "/static/images/carne-scaloppine.jpg" "Name" "Scaloppine al Limone" "Desc" "Kalbfleischscheiben, Zitronensauce, Petersilie" "Price" "10,50 €") }}
+            <div id="insalate" class="mb-12 pt-4">
+                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Insalate / Salate</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{ range .Menu }}
+                    {{ if eq .Category "Insalate" }}
+                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
+                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ .Description }}</p>
+                        </div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
 
+            <div id="pizza" class="mb-12 pt-4">
+                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pizza</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{ range .Menu }}
+                    {{ if eq .Category "Pizza" }}
+                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
+                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ .Description }}</p>
+                        </div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+
+            <div id="spaghetti" class="mb-12 pt-4">
+                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Spaghetti</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{ range .Menu }}
+                    {{ if eq .Category "Spaghetti" }}
+                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
+                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ .Description }}</p>
+                        </div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+
+            <div id="penne" class="mb-12 pt-4">
+                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Penne</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{ range .Menu }}
+                    {{ if eq .Category "Penne" }}
+                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
+                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ .Description }}</p>
+                        </div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+
+            <div id="rigatoni" class="mb-12 pt-4">
+                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Rigatoni</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{ range .Menu }}
+                    {{ if eq .Category "Rigatoni" }}
+                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
+                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ .Description }}</p>
+                        </div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+
+            <div id="pasta-al-forno" class="mb-12 pt-4">
+                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pasta al Forno / Nudelgerichte überbacken</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{ range .Menu }}
+                    {{ if eq .Category "Pasta al Forno" }}
+                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
+                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ .Description }}</p>
+                        </div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+
+            <div id="pesce" class="mb-12 pt-4">
+                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pesce Fritto / Fisch fritiert</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{ range .Menu }}
+                    {{ if eq .Category "Pesce Fritto" }}
+                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
+                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ .Description }}</p>
+                        </div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
+
+            <div id="carne" class="mb-12 pt-4">
+                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Carne / Fleisch</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {{ range .Menu }}
+                    {{ if eq .Category "Carne" }}
+                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
+                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
+                            </div>
+                            <p class="text-gray-700">{{ .Description }}</p>
+                        </div>
+                    </div>
+                    {{ end }}
+                    {{ end }}
+                </div>
+            </div>
         </div>
     </section>
 </main>

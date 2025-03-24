@@ -1,0 +1,77 @@
+{{ define "category-nav" }}
+<div class="mb-8">
+    <!-- Search bar -->
+    <div class="max-w-md mx-auto mb-6">
+        <form id="menuSearchForm" class="flex items-center">
+            <input type="text" id="menuSearchInput" placeholder="Search our menu..."
+                   class="w-full p-3 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-pizza-red">
+            <button type="submit" class="bg-pizza-red text-white p-3 rounded-r-lg hover:bg-red-700 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </button>
+        </form>
+    </div>
+
+    <!-- Category buttons -->
+    <div class="flex flex-wrap justify-center gap-3 py-2">
+        <a href="#antipasti" class="category-btn">Antipasti</a>
+        <a href="#insalate" class="category-btn">Insalate</a>
+        <a href="#pizza" class="category-btn">Pizza</a>
+        <a href="#spaghetti" class="category-btn">Spaghetti</a>
+        <a href="#penne" class="category-btn">Penne</a>
+        <a href="#rigatoni" class="category-btn">Rigatoni</a>
+        <a href="#pasta-al-forno" class="category-btn">Pasta al Forno</a>
+        <a href="#pesce" class="category-btn">Pesce Fritto</a>
+        <a href="#carne" class="category-btn">Carne</a>
+    </div>
+</div>
+
+<style>
+    .category-btn {
+        @apply px-4 py-2 bg-white border border-pizza-red text-pizza-red rounded-full font-medium
+        hover:bg-pizza-red hover:text-white transition-colors shadow-sm;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchForm = document.getElementById('menuSearchForm');
+        const searchInput = document.getElementById('menuSearchInput');
+
+        // Search functionality
+        searchForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const searchTerm = searchInput.value.toLowerCase();
+
+            // Find all menu items
+            const menuItems = document.querySelectorAll('.menu-item');
+            let found = false;
+
+            // Try to find a match
+            for (const item of menuItems) {
+                const itemName = item.querySelector('h3').textContent.toLowerCase();
+                const itemDesc = item.querySelector('p').textContent.toLowerCase();
+
+                if (itemName.includes(searchTerm) || itemDesc.includes(searchTerm)) {
+                    // Scroll to the found item
+                    item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    // Highlight the found item temporarily
+                    item.classList.add('found-item');
+                    setTimeout(() => {
+                        item.classList.remove('found-item');
+                    }, 3000);
+
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                alert('No menu items found matching "' + searchTerm + '"');
+            }
+        });
+    });
+</script>
+{{ end }}
