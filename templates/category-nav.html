@@ -8,7 +8,7 @@
                     <div class="search-container">
                         <input type="text" id="menuSearchInput" placeholder="Suche...">
                         <button type="submit" id="menuSearchButton">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="red" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                             </svg>
@@ -18,7 +18,7 @@
             </div>
 
             <!-- Category buttons in the center -->
-            <div class="flex-grow flex flex-wrap items-center justify-center gap-2">
+            <div class="flex-grow flex items-center justify-center gap-2 overflow-x-auto whitespace-nowrap">
                 <a href="#antipasti" class="category-btn">Antipasti</a>
                 <a href="#insalate" class="category-btn">Insalate</a>
                 <a href="#pizza" class="category-btn">Pizza</a>
@@ -52,9 +52,9 @@
     }
 
     .category-btn:hover, .category-btn.active {
-        background-color: #2632dc;
+        background-color: #dc2626;
         color: white;
-        border-color: #2632dc;
+        border-color: #dc2626;
     }
 
     /* Custom search styling */
@@ -102,6 +102,18 @@
         
         .search-container {
             width: 150px;
+        }
+    }
+    .category-btn {
+        white-space: nowrap;
+    }
+
+    @media (max-width: 768px) {
+        .flex-grow {
+            justify-content: flex-start;
+            margin-top: 0.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
     }
 </style>
