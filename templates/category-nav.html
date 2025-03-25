@@ -137,6 +137,69 @@
         // Highlight the current section when scrolling
         const categoryLinks = document.querySelectorAll('.category-btn');
         const sections = document.querySelectorAll('[id^="antipasti"], [id^="insalate"], [id^="pizza"], [id^="spaghetti"], [id^="penne"], [id^="rigatoni"], [id^="pasta-al-forno"], [id^="pesce"], [id^="carne"]');
+        
+        // Function to scroll carousel to active category
+        function scrollCarouselToActive(activeLink) {
+            if (!activeLink || window.innerWidth > 768) return;
+            
+            const carousel = document.querySelector('.flex-grow');
+            if (!carousel) return;
+            
+            // Calculate position to scroll to
+            const linkRect = activeLink.getBoundingClientRect();
+            const carouselRect = carousel.getBoundingClientRect();
+            
+            // Scroll to center the active link in the carousel
+            const scrollLeft = linkRect.left + carousel.scrollLeft - carouselRect.left - (carouselRect.width / 2) + (linkRect.width / 2);
+            
+            // Smooth scroll to position
+            carousel.scrollTo({
+                left: scrollLeft,
+                behavior: 'smooth'
+            });
+        }
+        
+        // Initial check for current section on page load
+        function checkCurrentSection() {
+            let current = '';
+            let activeLink = null;
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+            
+            categoryLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').substring(1) === current) {
+                    link.classList.add('active');
+                    activeLink = link;
+                }
+            });
+            
+            return activeLink;
+        }
+        
+        // Run on page load
+        setTimeout(() => {
+            const activeLink = checkCurrentSection();
+            scrollCarouselToActive(activeLink);
+        }, 500);
+        
+        // Handle direct links to sections
+        if (window.location.hash) {
+            setTimeout(() => {
+                const hash = window.location.hash.substring(1);
+                const targetLink = Array.from(categoryLinks).find(link =>
+                    link.getAttribute('href').substring(1) === hash
+                );
+                if (targetLink) {
+                    scrollCarouselToActive(targetLink);
+                }
+            }, 700);
+        }
 
         window.addEventListener('scroll', function() {
             let current = '';
@@ -152,6 +215,25 @@
                 link.classList.remove('active');
                 if (link.getAttribute('href').substring(1) === current) {
                     link.classList.add('active');
+                    
+                    // Auto-scroll carousel to show active category on mobile
+                    if (window.innerWidth <= 768) {
+                        const carousel = document.querySelector('.flex-grow');
+                        if (carousel) {
+                            // Calculate position to scroll to
+                            const linkRect = link.getBoundingClientRect();
+                            const carouselRect = carousel.getBoundingClientRect();
+                            
+                            // Scroll to center the active link in the carousel
+                            const scrollLeft = linkRect.left + carousel.scrollLeft - carouselRect.left - (carouselRect.width / 2) + (linkRect.width / 2);
+                            
+                            // Smooth scroll to position
+                            carousel.scrollTo({
+                                left: scrollLeft,
+                                behavior: 'smooth'
+                            });
+                        }
+                    }
                 }
             });
         });
