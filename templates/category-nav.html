@@ -4,27 +4,17 @@
         <div class="flex flex-wrap items-center justify-between gap-4">
             <!-- Search form on the left -->
             <div class="flex-shrink-0 w-auto">
-                <div class="flex items-center gap-3">
-                    <!-- Search input with styling that exactly matches category buttons -->
-                    <!-- Extremely minimal search input -->
-                    <div class="relative">
-                        <input type="text" id="menuSearchInput"
-                               class="w-2.5 py-[0.375rem] pl-1 pr-0 text-sm text-white bg-transparent border border-white/30 focus:outline-none focus:border-white/70 focus:ring-1 focus:ring-white/70 focus:w-20 transition-all duration-200"
-                               style="border-radius: 9999px !important; -webkit-border-radius: 9999px !important;"
-                               placeholder="">
+                <form id="searchForm" class="flex items-center">
+                    <div class="search-container">
+                        <input type="text" id="menuSearchInput" placeholder="Suche...">
+                        <button type="submit" id="menuSearchButton">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                            </svg>
+                        </button>
                     </div>
-
-
-
-
-
-                    <!-- Transparent button with just the magnifying glass -->
-                    <button type="button" id="menuSearchButton"
-                            style="background-color: transparent; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                        <!-- Larger magnifying glass emoji -->
-                        <span style="color: white; font-size: 22px;">🔍</span>
-                    </button>
-                </div>
+                </form>
             </div>
 
             <!-- Category buttons in the center -->
@@ -62,23 +52,46 @@
     }
 
     .category-btn:hover, .category-btn.active {
-        background-color: #dc2626;
+        background-color: #2632dc;
         color: white;
-        border-color: #dc2626;
+        border-color: #2632dc;
     }
 
-    /* Add specific button styling for hover effects */
+    /* Custom search styling */
+    .search-container {
+        position: relative;
+        width: 200px;
+    }
+
+    #menuSearchInput {
+        width: 100%;
+        padding: 0.375rem 0.75rem;
+        font-size: 0.875rem;
+        color: black;
+        background-color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 9999px;
+        outline: none;
+        transition: all 0.2s ease;
+    }
+
+    #menuSearchInput:focus {
+        border-color: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+    }
+
     #menuSearchButton {
+        position: absolute;
+        right: 0;
+        top: 0;
+        height: 100%;
+        background: transparent;
+        border: none;
         cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-    #menuSearchButton:hover {
-        transform: scale(1.1);
-    }
-
-    #menuSearchButton:active {
-        transform: scale(0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-right: 8px;
     }
 
     @media (max-width: 768px) {
@@ -86,13 +99,17 @@
             justify-content: flex-start;
             margin-top: 0.5rem;
         }
+        
+        .search-container {
+            width: 150px;
+        }
     }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('menuSearchInput');
-        const searchButton = document.getElementById('menuSearchButton');
+        const searchForm = document.getElementById('searchForm');
 
         // Highlight the current section when scrolling
         const categoryLinks = document.querySelectorAll('.category-btn');
@@ -117,7 +134,9 @@
         });
 
         // Function to perform search
-        function performSearch() {
+        function performSearch(e) {
+            if (e) e.preventDefault();
+            
             const searchTerm = searchInput.value.toLowerCase().trim();
 
             if (searchTerm.trim() === '') return;
@@ -156,17 +175,8 @@
             }
         }
 
-        searchButton.addEventListener('click', function(e) {
-            e.preventDefault();
-            performSearch();
-        });
-
-        searchInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                performSearch();
-            }
-        });
+        // Handle search form submission
+        searchForm.addEventListener('submit', performSearch);
     });
 </script>
 {{ end }}
