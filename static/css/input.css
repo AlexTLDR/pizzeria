@@ -1,28 +1,29 @@
 @import 'tailwindcss';
 
+@tailwind utilities;
+
 @layer components {
     .gradient-background {
         background: linear-gradient(300deg, #0077b6, #00b4d8, #48cae4, #90e0ef, #caf0f8);
         background-size: 180% 180%;
+        animation: gradient 9s ease infinite; /* Changed from 18s to 9s */
+    }
+}
+
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@layer utilities {
+    .animate-gradient {
         animation: gradient 18s ease infinite;
-
-    }
-
-    @keyframes gradient {
-        0% {
-            background-position: 0% 50%;
-        }
-        50% {
-            background-position: 100% 50%;
-        }
-        100% {
-            background-position: 0% 50%;
-        }
-    }
-
-    @layer utilities {
-        .animate-gradient {
-            animation: gradient 18s ease infinite;
-        }
     }
 }

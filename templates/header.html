@@ -1,14 +1,22 @@
 {{ define "header" }}
-<header class="bg-gray-800 text-white shadow-md">
-    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
-        <div class="text-3xl font-display font-bold text-white">Pizzeria Ristorante
-            La piccola Sardegna</div>
-        <ul class="flex space-x-6">
-            <li><a href="/" class="hover:text-pizza-red transition duration-300">Home</a></li>
-            <li><a href="/menu" class="hover:text-pizza-red transition duration-300">Menu</a></li>
-            <li><a href="/order" class="hover:text-pizza-red transition duration-300">Order Online</a></li>
-        </ul>
-    </nav>
+<header class="bg-transparent py-4">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <!-- Restaurant name in Garamond and phone on the left -->
+            <div class="text-center md:text-left mb-4 md:mb-0">
+                <div class="font-garamond text-3xl font-bold text-black leading-tight">Pizzeria Ristorante</div>
+                <div class="font-garamond text-3xl font-bold text-black leading-tight">La piccola Sardegna</div>
+                <div class="text-lg text-black">☎️ 07176 2122</div>
+            </div>
+
+            <!-- Logo in the center -->
+            <div class="flex-shrink-0">
+                <img src="/static/images/la-piccola-sardegna-titel.png" alt="La piccola Sardegna Logo" class="h-24 md:h-32 object-contain">
+            </div>
+
+            <!-- Empty div for balance on the right -->
+            <div class="hidden md:block md:w-1/4"></div>
+        </div>
+    </div>
 </header>
 {{ end }}
-
