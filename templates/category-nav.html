@@ -1,47 +1,52 @@
 {{ define "category-nav" }}
 <div class="bg-gray-800 text-white py-3 sticky top-0 z-10 shadow-md mt-4">
     <div class="container mx-auto px-6">
-        <div class="flex flex-wrap items-center justify-center gap-4">
-            <!-- Search form with styling to match buttons -->
-            <form id="menuSearchForm" class="flex items-center order-first mr-3">
-                <div class="relative">
-                    <input type="text" id="menuSearchInput" placeholder="  🔍 Suchmenü..."
-                           style="border-radius: 9999px !important; overflow: hidden !important; border-width: 1px !important; text-indent: 1rem;"
-                           class="w-40 py-1.5 pl-9 pr-3 text-sm text-white bg-transparent border border-white/30 rounded-full focus:outline-none focus:border-white/70 focus:ring-1 focus:ring-white/70 placeholder-white/70">
-                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <!-- Search form on the left -->
+            <div class="flex-shrink-0 w-auto">
+                <div class="flex items-center gap-3">
+                    <!-- Search input with styling that exactly matches category buttons -->
+                    <!-- Extremely minimal search input -->
+                    <div class="relative">
+                        <input type="text" id="menuSearchInput"
+                               class="w-2.5 py-[0.375rem] pl-1 pr-0 text-sm text-white bg-transparent border border-white/30 focus:outline-none focus:border-white/70 focus:ring-1 focus:ring-white/70 focus:w-20 transition-all duration-200"
+                               style="border-radius: 9999px !important; -webkit-border-radius: 9999px !important;"
+                               placeholder="">
                     </div>
-                </div>
-                <button type="submit" class="hidden">Search</button>
-            </form>
 
-            <!-- Category buttons with more spacing -->
-            <a href="#antipasti" class="category-btn mx-1">Antipasti</a>
-            <a href="#insalate" class="category-btn mx-1">Insalate</a>
-            <a href="#pizza" class="category-btn mx-1">Pizza</a>
-            <a href="#spaghetti" class="category-btn mx-1">Spaghetti</a>
-            <a href="#penne" class="category-btn mx-1">Penne</a>
-            <a href="#rigatoni" class="category-btn mx-1">Rigatoni</a>
-            <a href="#pasta-al-forno" class="category-btn mx-1">Pasta al Forno</a>
-            <a href="#pesce" class="category-btn mx-1">Pesce</a>
-            <a href="#carne" class="category-btn mx-1">Carne</a>
+
+
+
+
+                    <!-- Transparent button with just the magnifying glass -->
+                    <button type="button" id="menuSearchButton"
+                            style="background-color: transparent; width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <!-- Larger magnifying glass emoji -->
+                        <span style="color: white; font-size: 22px;">🔍</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Category buttons in the center -->
+            <div class="flex-grow flex flex-wrap items-center justify-center gap-2">
+                <a href="#antipasti" class="category-btn">Antipasti</a>
+                <a href="#insalate" class="category-btn">Insalate</a>
+                <a href="#pizza" class="category-btn">Pizza</a>
+                <a href="#spaghetti" class="category-btn">Spaghetti</a>
+                <a href="#penne" class="category-btn">Penne</a>
+                <a href="#rigatoni" class="category-btn">Rigatoni</a>
+                <a href="#pasta-al-forno" class="category-btn">Pasta al Forno</a>
+                <a href="#pesce" class="category-btn">Pesce</a>
+                <a href="#carne" class="category-btn">Carne</a>
+            </div>
+
+            <div class="flex-shrink-0 w-auto md:block hidden">
+            </div>
         </div>
     </div>
 </div>
 
 <style>
-    /* Match search input styling to buttons */
-    #menuSearchInput {
-        border-radius: 9999px !important;
-        overflow: hidden !important;
-        border-width: 1px !important;
-        padding-top: 0.375rem !important;
-        padding-bottom: 0.375rem !important;
-        font-weight: 500 !important;
-    }
-
     .category-btn {
         display: inline-block;
         padding: 0.375rem 0.75rem;
@@ -61,12 +66,33 @@
         color: white;
         border-color: #dc2626;
     }
+
+    /* Add specific button styling for hover effects */
+    #menuSearchButton {
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    #menuSearchButton:hover {
+        transform: scale(1.1);
+    }
+
+    #menuSearchButton:active {
+        transform: scale(0.95);
+    }
+
+    @media (max-width: 768px) {
+        .flex-grow {
+            justify-content: flex-start;
+            margin-top: 0.5rem;
+        }
+    }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const searchForm = document.getElementById('menuSearchForm');
         const searchInput = document.getElementById('menuSearchInput');
+        const searchButton = document.getElementById('menuSearchButton');
 
         // Highlight the current section when scrolling
         const categoryLinks = document.querySelectorAll('.category-btn');
@@ -90,16 +116,20 @@
             });
         });
 
-        // Search functionality - only triggered when form is submitted (Enter key)
-        searchForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const searchTerm = searchInput.value.toLowerCase();
+        // Function to perform search
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
 
             if (searchTerm.trim() === '') return;
 
             // Find all menu items
             const menuItems = document.querySelectorAll('.menu-item');
             let found = false;
+
+            // Remove previous highlights
+            document.querySelectorAll('.found-item').forEach(item => {
+                item.classList.remove('found-item');
+            });
 
             // Try to find a match
             for (const item of menuItems) {
@@ -123,6 +153,18 @@
 
             if (!found) {
                 searchInput.value = '';
+            }
+        }
+
+        searchButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            performSearch();
+        });
+
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performSearch();
             }
         });
     });

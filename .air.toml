@@ -1,0 +1,21 @@
+# Config file for Air (https://github.com/cosmtrek/air)
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/main ./cmd/server/main.go"
+bin = "tmp/main"
+full_bin = "./tmp/main"
+include_ext = ["go", "html", "css"]
+exclude_dir = ["assets", "tmp", "vendor", ".git", "node_modules"]
+include_dir = ["cmd", "templates", "static/css"]
+log = "air.log"
+
+[color]
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[misc]
+clean_on_exit = true
