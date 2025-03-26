@@ -40,10 +40,16 @@ func main() {
 		// Antipasti
 		{ID: "a1", Name: "Antipasto di Mare", Description: "mit Meeresfrüchte", Price: 16.50, Category: "Antipasti", ImageURL: "/static/images/menu/antipasto-di-mare.jpeg"},
 		{ID: "a2", Name: "Antipasto della Casa", Description: "Gemischte Vorspeisenplatte mit italienischen Wurstsorten und Caprese", Price: 14.50, Category: "Antipasti", ImageURL: "/static/images/menu/antipasto-della-casa.jpeg"},
+		{ID: "a3", Name: "Tomatensuppe", Description: "", Price: 7.60, Category: "Antipasti", ImageURL: "/static/images/menu/tomatensuppe.jpeg"},
+		{ID: "a4", Name: "Bruscheta", Description: "Selbst gebakenes Brot mit frischen Tomaten und Knoblauch", Price: 8.50, Category: "Antipasti", ImageURL: "/static/images/menu/bruscheta.jpeg"},
+		{ID: "a5", Name: "Caprese", Description: "Tomaten, Mozzarella mit Panini", Price: 9.50, Category: "Antipasti", ImageURL: "/static/images/menu/caprese.jpeg"},
 
 		// Insalate
-		{ID: "i1", Name: "Caesar Salad", Description: "Romaine lettuce, croutons, parmesan, and Caesar dressing", Price: 9.99, Category: "Insalate", ImageURL: "/static/images/caesar.jpg"},
-		{ID: "i2", Name: "Mediterranean Salad", Description: "Mixed greens, olives, feta, and red onion", Price: 11.99, Category: "Insalate", ImageURL: "/static/images/mediterranean.jpg"},
+		{ID: "i1", Name: "Gemischter Salat", Description: "", Price: 4.90, Category: "Insalate", ImageURL: "/static/images/menu/gemischter-salat.jpeg"},
+		{ID: "i2", Name: "Salat Tonno", Description: "Gemischter Salat mit Thunfisch, Panini", Price: 10.40, Category: "Insalate", ImageURL: "/static/images/menu/salat-tonno.jpeg"},
+		{ID: "i1", Name: "Salat Capricciosa", Description: "Gemischter Salat mit Mozzarella, Landschinken, Panini", Price: 10.80, Category: "Insalate", ImageURL: "/static/images/menu/salat-capricciosa.jpeg"},
+		{ID: "i1", Name: "Salat della Casa", Description: "Gemischter Salat mit Putenstreifen, panini", Price: 12.80, Category: "Insalate", ImageURL: "/static/images/menu/salat-della-casa.jpeg"},
+		{ID: "i1", Name: "Salat Marinara", Description: "Gemischter Salat mit Meeresfrüchte, Panini", Price: 12.80, Category: "Insalate", ImageURL: "/static/images/menu/salat-marinara.jpeg"},
 
 		// Pizza
 		{ID: "p1", Name: "Margherita", Description: "Classic tomato sauce, mozzarella, and basil", Price: 12.99, Category: "Pizza", ImageURL: "/static/images/margherita.jpg"},
