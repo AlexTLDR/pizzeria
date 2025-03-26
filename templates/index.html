@@ -1,241 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Title }}</title>
-    <link href="/static/css/output.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-    <style>
-        .found-item {
-            animation: highlight 3s;
-        }
-        .font-garamond {
-            font-family: 'EB Garamond', serif;
-        }
-
-        @keyframes highlight {
-            0% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0); }
-            20% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 1); }
-            80% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 1); }
-            100% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0); }
-        }
-        .spacer-32 {
-            height: 32px !important;
-            min-height: 32px !important;
-            display: block !important;
-        }
-    </style>
-</head>
-<body class="min-h-screen relative">
-<!-- Gradient Background -->
-<div class="gradient-background fixed inset-0 -z-10"></div>
-
-{{ template "header" . }}
-
-<main>
-    <!-- Announcement Banner -->
-    <section class="py-6 bg-transparent">
-        <div class="container mx-auto px-6 text-center">
-            <h2 class="text-2xl font-display font-bold text-black">Dienstag Pizza Tag!</h2>
-            <p class="mt-2 text-black">
-                Auf unserer Speisekarte stehen am Dienstag
-                nur Pizzen und Salate.
-            </p>
-        </div>
-    </section>
-    <div class="spacer-32"></div>
-    {{ template "category-nav" . }}
-    <!-- Menu Section -->
-    <section class="py-12 bg-transparent">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-display font-bold text-center mb-8">Our Menu</h2>
-
-            <!-- Menu Categories -->
-            <div id="antipasti" class="mb-12 pt-4">
-                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Antipasti / Vorspeisen</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Antipasti" }}
-                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>{{ .Title }}</title>
+      <link href="/static/css/output.css" rel="stylesheet">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap">
+      <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+      <style>
+         .found-item {
+         animation: highlight 3s;
+         }
+         .font-garamond {
+         font-family: 'EB Garamond', serif;
+         }
+         @keyframes highlight {
+         0% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0); }
+         20% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 1); }
+         80% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 1); }
+         100% { box-shadow: 0 0 0 2px rgba(220, 38, 38, 0); }
+         }
+         .spacer-32 {
+         height: 32px !important;
+         min-height: 32px !important;
+         display: block !important;
+         }
+      </style>
+   </head>
+   <body class="min-h-screen relative">
+      <!-- Gradient Background -->
+      <div class="gradient-background fixed inset-0 -z-10"></div>
+      {{ template "header" . }}
+      <main>
+         <!-- Announcement Banner -->
+         <section class="py-6 bg-transparent">
+            <div class="container mx-auto px-6 text-center">
+               <h2 class="text-2xl font-display font-bold text-black">Dienstag Pizza Tag!</h2>
+               <p class="mt-2 text-black">
+                  Auf unserer Speisekarte stehen am Dienstag
+                  nur Pizzen und Salate.
+               </p>
+            </div>
+         </section>
+         <div class="spacer-32"></div>
+         {{ template "category-nav" . }}
+         <!-- Menu Section -->
+         <section class="py-12 bg-transparent">
+            <div class="container mx-auto px-6">
+               <h2 class="text-3xl font-display font-bold text-center mb-8">Our Menu</h2>
+               <!-- Menu Categories -->
+               <div id="antipasti" class="mb-12 pt-4">
+                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Antipasti / Vorspeisen</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {{ range .Menu }}
+                     {{ if eq .Category "Antipasti" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
-                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
-                            </div>
-                            <p class="text-gray-700">{{ .Description }}</p>
+                           <div class="flex justify-between items-center mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-
-            <div id="insalate" class="mb-12 pt-4">
-                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Insalate / Salate</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Insalate" }}
-                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                     </div>
+                     {{ end }}
+                     {{ end }}
+                  </div>
+               </div>
+               <div id="insalate" class="mb-12 pt-4">
+                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Insalate / Salate</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {{ range .Menu }}
+                     {{ if eq .Category "Insalate" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
-                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
-                            </div>
-                            <p class="text-gray-700">{{ .Description }}</p>
+                           <div class="flex justify-between items-center mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-
-            <div id="pizza" class="mb-12 pt-4">
-                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pizza</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Pizza" }}
-                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                     </div>
+                     {{ end }}
+                     {{ end }}
+                  </div>
+               </div>
+               <div id="pizza" class="mb-12 pt-4">
+                  <style>
+                     @media (min-width: 768px) {
+                     .mobile-size-info {
+                     display: none !important;
+                     }
+                     .desktop-size-info {
+                     display: block !important;
+                     }
+                     }
+                     @media (max-width: 767px) {
+                     .mobile-size-info {
+                     display: block !important;
+                     }
+                     .desktop-size-info {
+                     display: none !important;
+                     }
+                     }
+                  </style>
+                  <!-- Single heading with responsive size descriptions -->
+                  <div class="mb-6 border-b-2 border-pizza-red pb-2">
+                     <h2 class="text-2xl font-display font-bold">Pizza</h2>
+                     <!-- Mobile size text -->
+                     <div class="mobile-size-info mt-1">
+                        <h3 class="text-base font-medium text-black">26 cm ⌀ (klein) | 32 cm ⌀ (normal)</h3>
+                     </div>
+                     <!-- Desktop size text -->
+                     <div class="desktop-size-info mt-1">
+                        <h3 class="text-base font-medium text-black">Größen: klein ca. 26cm | normal ca. 32cm ⌀</h3>
+                     </div>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {{ range .Menu }}
+                     {{ if eq .Category "Pizza" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
-                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
-                            </div>
-                            <p class="text-gray-700">{{ .Description }}</p>
+                           <div class="flex justify-between items-start mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <div class="text-right text-white font-bold">
+                                 {{ if .SmallPrice }}
+                                 <!-- Mobile: Stacked prices -->
+                                 <div class="flex flex-col md:hidden">
+                                    <div><span class="text-sm text-gray-300">klein:</span> €{{ printf "%.2f" (deref .SmallPrice) }}</div>
+                                    <div><span class="text-sm text-gray-300">normal:</span> €{{ printf "%.2f" .Price }}</div>
+                                 </div>
+                                 <!-- Desktop: Horizontal prices -->
+                                 <div class="hidden md:block">
+                                    <span class="text-sm">klein:</span> €{{ printf "%.2f" (deref .SmallPrice) }} <span class="mx-1">|</span> <span class="text-sm">normal:</span> €{{ printf "%.2f" .Price }}
+                                 </div>
+                                 {{ else }}
+                                 <!-- Only normal price -->
+                                 <div>€{{ printf "%.2f" .Price }}</div>
+                                 {{ end }}
+                              </div>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-
-            <div id="spaghetti" class="mb-12 pt-4">
-                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Spaghetti</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Spaghetti" }}
-                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                     </div>
+                     {{ end }}
+                     {{ end }}
+                  </div>
+               </div>
+               <div id="spaghetti" class="mb-12 pt-4">
+                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Spaghetti</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {{ range .Menu }}
+                     {{ if eq .Category "Spaghetti" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
-                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
-                            </div>
-                            <p class="text-gray-700">{{ .Description }}</p>
+                           <div class="flex justify-between items-center mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-
-            <div id="penne" class="mb-12 pt-4">
-                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Penne</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Penne" }}
-                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                     </div>
+                     {{ end }}
+                     {{ end }}
+                  </div>
+               </div>
+               <div id="penne" class="mb-12 pt-4">
+                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Penne</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {{ range .Menu }}
+                     {{ if eq .Category "Penne" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
-                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
-                            </div>
-                            <p class="text-gray-700">{{ .Description }}</p>
+                           <div class="flex justify-between items-center mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-
-            <div id="rigatoni" class="mb-12 pt-4">
-                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Rigatoni</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Rigatoni" }}
-                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                     </div>
+                     {{ end }}
+                     {{ end }}
+                  </div>
+               </div>
+               <div id="rigatoni" class="mb-12 pt-4">
+                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Rigatoni</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {{ range .Menu }}
+                     {{ if eq .Category "Rigatoni" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
-                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
-                            </div>
-                            <p class="text-gray-700">{{ .Description }}</p>
+                           <div class="flex justify-between items-center mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-
-            <div id="pasta-al-forno" class="mb-12 pt-4">
-                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pasta al Forno / Nudelgerichte überbacken</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Pasta al Forno" }}
-                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                     </div>
+                     {{ end }}
+                     {{ end }}
+                  </div>
+               </div>
+               <div id="pasta-al-forno" class="mb-12 pt-4">
+                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pasta al Forno / Nudelgerichte überbacken</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {{ range .Menu }}
+                     {{ if eq .Category "Pasta al Forno" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
-                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
-                            </div>
-                            <p class="text-gray-700">{{ .Description }}</p>
+                           <div class="flex justify-between items-center mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-
-            <div id="pesce" class="mb-12 pt-4">
-                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pesce Fritto / Fisch fritiert</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Pesce Fritto" }}
-                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                     </div>
+                     {{ end }}
+                     {{ end }}
+                  </div>
+               </div>
+               <div id="pesce" class="mb-12 pt-4">
+                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pesce Fritto / Fisch fritiert</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {{ range .Menu }}
+                     {{ if eq .Category "Pesce Fritto" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
-                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
-                            </div>
-                            <p class="text-gray-700">{{ .Description }}</p>
+                           <div class="flex justify-between items-center mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-
-            <div id="carne" class="mb-12 pt-4">
-                <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Carne / Fleisch</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Carne" }}
-                    <div class="menu-item bg-white rounded-lg shadow-md overflow-hidden">
+                     </div>
+                     {{ end }}
+                     {{ end }}
+                  </div>
+               </div>
+               <div id="carne" class="mb-12 pt-4">
+                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Carne / Fleisch</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                     {{ range .Menu }}
+                     {{ if eq .Category "Carne" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
                         <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
                         <div class="p-4">
-                            <div class="flex justify-between items-center mb-2">
-                                <h3 class="text-xl font-bold">{{ .Name }}</h3>
-                                <span class="text-pizza-red font-bold">${{ .Price }}</span>
-                            </div>
-                            <p class="text-gray-700">{{ .Description }}</p>
+                           <div class="flex justify-between items-center mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
-                </div>
+                     </div>
+                     {{ end }}
+                     {{ end }}
+                  </div>
+               </div>
             </div>
-        </div>
-    </section>
-</main>
-
-{{ template "footer" . }}
-</body>
+         </section>
+      </main>
+      {{ template "footer" . }}
+   </body>
 </html>

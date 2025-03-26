@@ -1,22 +1,30 @@
 {{ define "header" }}
 <header class="bg-transparent py-4">
-    <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row items-center justify-between">
-            <!-- Restaurant name in Garamond and phone on the left -->
-            <div class="text-center md:text-left mb-4 md:mb-0">
-                <div class="font-garamond text-3xl font-bold text-black leading-tight">Pizzeria Ristorante</div>
-                <div class="font-garamond text-3xl font-bold text-black leading-tight">La piccola Sardegna</div>
-                <div class="text-lg text-black">☎️ 07176 2122</div>
-            </div>
-
-            <!-- Logo in the center -->
-            <div class="flex-shrink-0">
-                <img src="/static/images/la-piccola-sardegna-titel.png" alt="La piccola Sardegna Logo" class="h-24 md:h-32 object-contain">
-            </div>
-
-            <!-- Empty div for balance on the right -->
-            <div class="hidden md:block md:w-1/4"></div>
-        </div>
-    </div>
+   <div class="container mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between">
+         <!-- Restaurant name in Garamond and phone on the left -->
+         <div class="text-center md:text-left mb-4 md:mb-0">
+            <div class="font-garamond text-3xl font-bold text-black leading-tight">Pizzeria Ristorante</div>
+            <div class="font-garamond text-3xl font-bold text-black leading-tight">La piccola Sardegna</div>
+            <div class="text-lg text-black">☎️ 07176 2122</div>
+         </div>
+         <!-- Empty div for balance in the center (replacing the logo) -->
+         <div class="hidden md:block md:w-1/4"></div>
+         <!-- Logo on the right -->
+         <div class="flex-shrink-0 logo-mobile-center">
+            <img src="/static/images/la-piccola-sardegna-titel.png" alt="La piccola Sardegna Logo" class="h-24 md:h-32 object-contain">
+         </div>
+      </div>
+   </div>
 </header>
+<style>
+   /* mobile view */
+   @media (max-width: 767px) {
+   .logo-mobile-center {
+   display: flex;
+   width: 100%;
+   justify-content: center;
+   }
+   }
+</style>
 {{ end }}

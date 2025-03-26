@@ -13,8 +13,13 @@ type MenuItem struct {
 	Name        string
 	Description string
 	Price       float64
+	SmallPrice  *float64
 	Category    string
 	ImageURL    string
+}
+
+func smallPrice(price float64) *float64 {
+	return &price
 }
 
 // Template function map with the dict function
@@ -33,22 +38,34 @@ var funcMap = template.FuncMap{
 		}
 		return dict, nil
 	},
+	"deref": func(f *float64) float64 {
+		if f == nil {
+			return 0.0
+		}
+		return *f
+	},
 }
 
 func main() {
 	menuItems := []MenuItem{
 		// Antipasti
-		{ID: "a1", Name: "Bruschetta", Description: "Toasted bread with fresh tomatoes, garlic, and basil", Price: 8.99, Category: "Antipasti", ImageURL: "/static/images/bruschetta.jpg"},
-		{ID: "a2", Name: "Caprese", Description: "Fresh mozzarella, tomatoes, and basil with balsamic glaze", Price: 10.99, Category: "Antipasti", ImageURL: "/static/images/caprese.jpg"},
+		{ID: "a1", Name: "Antipasto di Mare", Description: "mit Meeresfrüchte", Price: 16.50, Category: "Antipasti", ImageURL: "/static/images/menu/antipasto-di-mare.jpeg"},
+		{ID: "a2", Name: "Antipasto della Casa", Description: "Gemischte Vorspeisenplatte mit italienischen Wurstsorten und Caprese", Price: 14.50, Category: "Antipasti", ImageURL: "/static/images/menu/antipasto-della-casa.jpeg"},
+		{ID: "a3", Name: "Tomatensuppe", Description: "", Price: 7.60, Category: "Antipasti", ImageURL: "/static/images/menu/tomatensuppe.jpeg"},
+		{ID: "a4", Name: "Bruscheta", Description: "Selbst gebakenes Brot mit frischen Tomaten und Knoblauch", Price: 8.50, Category: "Antipasti", ImageURL: "/static/images/menu/bruscheta.jpeg"},
+		{ID: "a5", Name: "Caprese", Description: "Tomaten, Mozzarella mit Panini", Price: 9.50, Category: "Antipasti", ImageURL: "/static/images/menu/caprese.jpeg"},
 
 		// Insalate
-		{ID: "i1", Name: "Caesar Salad", Description: "Romaine lettuce, croutons, parmesan, and Caesar dressing", Price: 9.99, Category: "Insalate", ImageURL: "/static/images/caesar.jpg"},
-		{ID: "i2", Name: "Mediterranean Salad", Description: "Mixed greens, olives, feta, and red onion", Price: 11.99, Category: "Insalate", ImageURL: "/static/images/mediterranean.jpg"},
+		{ID: "i1", Name: "Gemischter Salat", Description: "", Price: 4.90, Category: "Insalate", ImageURL: "/static/images/menu/gemischter-salat.jpeg"},
+		{ID: "i2", Name: "Salat Tonno", Description: "Gemischter Salat mit Thunfisch, Panini", Price: 10.40, Category: "Insalate", ImageURL: "/static/images/menu/salat-tonno.jpeg"},
+		{ID: "i1", Name: "Salat Capricciosa", Description: "Gemischter Salat mit Mozzarella, Landschinken, Panini", Price: 10.80, Category: "Insalate", ImageURL: "/static/images/menu/salat-capricciosa.jpeg"},
+		{ID: "i1", Name: "Salat della Casa", Description: "Gemischter Salat mit Putenstreifen, panini", Price: 12.80, Category: "Insalate", ImageURL: "/static/images/menu/salat-della-casa.jpeg"},
+		{ID: "i1", Name: "Salat Marinara", Description: "Gemischter Salat mit Meeresfrüchte, Panini", Price: 12.80, Category: "Insalate", ImageURL: "/static/images/menu/salat-marinara.jpeg"},
 
 		// Pizza
-		{ID: "p1", Name: "Margherita", Description: "Classic tomato sauce, mozzarella, and basil", Price: 12.99, Category: "Pizza", ImageURL: "/static/images/margherita.jpg"},
-		{ID: "p2", Name: "Pepperoni", Description: "Tomato sauce, mozzarella, and pepperoni", Price: 14.99, Category: "Pizza", ImageURL: "/static/images/pepperoni.jpg"},
-		{ID: "p3", Name: "Quattro Formaggi", Description: "Four cheese pizza with mozzarella, gorgonzola, fontina, and parmesan", Price: 15.99, Category: "Pizza", ImageURL: "/static/images/quattro.jpg"},
+		{ID: "p1", Name: "Pizzabrot", Description: "", Price: 12.99, Category: "Pizza", ImageURL: "/static/images/menu/pizzabrot.jpeg"},
+		{ID: "p2", Name: "Pomodoro", Description: "Tomaten, Käse", Price: 9.60, SmallPrice: smallPrice(4.60), Category: "Pizza", ImageURL: "/static/images/menu/pomodoro.jpeg"},
+		{ID: "p3", Name: "Proscuitto", Description: "Vorderschinken", Price: 15.99, SmallPrice: smallPrice(4.60), Category: "Pizza", ImageURL: "/static/images/menu/proscuitto.jpeg"},
 
 		// Spaghetti
 		{ID: "s1", Name: "Spaghetti Carbonara", Description: "Creamy sauce with pancetta and parmesan", Price: 13.99, Category: "Spaghetti", ImageURL: "/static/images/carbonara.jpg"},
