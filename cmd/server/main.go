@@ -52,9 +52,9 @@ func main() {
 		{ID: "i1", Name: "Salat Marinara", Description: "Gemischter Salat mit Meeresfrüchte, Panini", Price: 12.80, Category: "Insalate", ImageURL: "/static/images/menu/salat-marinara.jpeg"},
 
 		// Pizza
-		{ID: "p1", Name: "Margherita", Description: "Classic tomato sauce, mozzarella, and basil", Price: 12.99, Category: "Pizza", ImageURL: "/static/images/margherita.jpg"},
-		{ID: "p2", Name: "Pepperoni", Description: "Tomato sauce, mozzarella, and pepperoni", Price: 14.99, Category: "Pizza", ImageURL: "/static/images/pepperoni.jpg"},
-		{ID: "p3", Name: "Quattro Formaggi", Description: "Four cheese pizza with mozzarella, gorgonzola, fontina, and parmesan", Price: 15.99, Category: "Pizza", ImageURL: "/static/images/quattro.jpg"},
+		{ID: "p1", Name: "Pizzabrot", Description: "", Price: 12.99, Category: "Pizza", ImageURL: "/static/images/menu/pizzabrot.jpeg"},
+		{ID: "p2", Name: "Pomodoro", Description: "Tomaten, Käse", Price: 9.60, Category: "Pizza", ImageURL: "/static/images/menu/pomodoro.jpeg"},
+		{ID: "p3", Name: "Proscuitto", Description: "Vorderschinken", Price: 15.99, Category: "Pizza", ImageURL: "/static/images/menu/proscuitto.jpeg"},
 
 		// Spaghetti
 		{ID: "s1", Name: "Spaghetti Carbonara", Description: "Creamy sauce with pancetta and parmesan", Price: 13.99, Category: "Spaghetti", ImageURL: "/static/images/carbonara.jpg"},
