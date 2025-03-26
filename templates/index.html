@@ -59,7 +59,7 @@
                         <div class="p-4">
                            <div class="flex justify-between items-center mb-2">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ .Price }}</span>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -78,7 +78,7 @@
                         <div class="p-4">
                            <div class="flex justify-between items-center mb-2">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ .Price }}</span>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -89,75 +89,67 @@
                </div>
                <div id="pizza" class="mb-12 pt-4">
                   <style>
-                    @media (min-width: 768px) {
-                      .mobile-size-info {
-                        display: none !important;
-                      }
-                      .desktop-size-info {
-                        display: block !important;
-                      }
-                    }
-                    
-                    @media (max-width: 767px) {
-                      .mobile-size-info {
-                        display: block !important;
-                      }
-                      .desktop-size-info {
-                        display: none !important;
-                      }
-                    }
+                     @media (min-width: 768px) {
+                     .mobile-size-info {
+                     display: none !important;
+                     }
+                     .desktop-size-info {
+                     display: block !important;
+                     }
+                     }
+                     @media (max-width: 767px) {
+                     .mobile-size-info {
+                     display: block !important;
+                     }
+                     .desktop-size-info {
+                     display: none !important;
+                     }
+                     }
                   </style>
-                
                   <!-- Single heading with responsive size descriptions -->
                   <div class="mb-6 border-b-2 border-pizza-red pb-2">
-                    <h2 class="text-2xl font-display font-bold">Pizza</h2>
-                    
-                    <!-- Mobile size text -->
-                    <div class="mobile-size-info mt-1">
-                      <h3 class="text-base font-medium text-black">26 cm ⌀ (klein) | 32 cm ⌀ (normal)</h3>
-                    </div>
-                    
-                    <!-- Desktop size text -->
-                    <div class="desktop-size-info mt-1">
-                      <h3 class="text-base font-medium text-black">Größen: klein ca. 26cm | normal ca. 32cm ⌀</h3>
-                    </div>
+                     <h2 class="text-2xl font-display font-bold">Pizza</h2>
+                     <!-- Mobile size text -->
+                     <div class="mobile-size-info mt-1">
+                        <h3 class="text-base font-medium text-black">26 cm ⌀ (klein) | 32 cm ⌀ (normal)</h3>
+                     </div>
+                     <!-- Desktop size text -->
+                     <div class="desktop-size-info mt-1">
+                        <h3 class="text-base font-medium text-black">Größen: klein ca. 26cm | normal ca. 32cm ⌀</h3>
+                     </div>
                   </div>
-                
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {{ range .Menu }}
-                    {{ if eq .Category "Pizza" }}
-                    <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                      <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
-                      <div class="p-4">
-                        <div class="flex justify-between items-start mb-2">
-                          <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                          <div class="text-right text-white font-bold">
-                            {{ if .SmallPrice }}
-                            <!-- Mobile: Stacked prices -->
-                            <div class="flex flex-col md:hidden">
-                              <div><span class="text-sm text-gray-300">klein:</span> €{{ .SmallPrice }}</div>
-                              <div><span class="text-sm text-gray-300">normal:</span> €{{ .Price }}</div>
-                            </div>
-                            
-                            <!-- Desktop: Horizontal prices -->
-                            <div class="hidden md:block">
-                              <span class="text-sm">klein:</span> €{{ .SmallPrice }} <span class="mx-1">|</span> <span class="text-sm">normal:</span> €{{ .Price }}
-                            </div>
-                            {{ else }}
-                            <!-- Only normal price -->
-                            <div>€{{ .Price }}</div>
-                            {{ end }}
-                          </div>
+                     {{ range .Menu }}
+                     {{ if eq .Category "Pizza" }}
+                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                           <div class="flex justify-between items-start mb-2">
+                              <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
+                              <div class="text-right text-white font-bold">
+                                 {{ if .SmallPrice }}
+                                 <!-- Mobile: Stacked prices -->
+                                 <div class="flex flex-col md:hidden">
+                                    <div><span class="text-sm text-gray-300">klein:</span> €{{ printf "%.2f" (deref .SmallPrice) }}</div>
+                                    <div><span class="text-sm text-gray-300">normal:</span> €{{ printf "%.2f" .Price }}</div>
+                                 </div>
+                                 <!-- Desktop: Horizontal prices -->
+                                 <div class="hidden md:block">
+                                    <span class="text-sm">klein:</span> €{{ printf "%.2f" (deref .SmallPrice) }} <span class="mx-1">|</span> <span class="text-sm">normal:</span> €{{ printf "%.2f" .Price }}
+                                 </div>
+                                 {{ else }}
+                                 <!-- Only normal price -->
+                                 <div>€{{ printf "%.2f" .Price }}</div>
+                                 {{ end }}
+                              </div>
+                           </div>
+                           <p class="text-white">{{ .Description }}</p>
                         </div>
-                        <p class="text-white">{{ .Description }}</p>
-                      </div>
-                    </div>
-                    {{ end }}
-                    {{ end }}
+                     </div>
+                     {{ end }}
+                     {{ end }}
                   </div>
-                </div>
-                
-                         
+               </div>
                <div id="spaghetti" class="mb-12 pt-4">
                   <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Spaghetti</h2>
                   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -168,7 +160,7 @@
                         <div class="p-4">
                            <div class="flex justify-between items-center mb-2">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ .Price }}</span>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -187,7 +179,7 @@
                         <div class="p-4">
                            <div class="flex justify-between items-center mb-2">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ .Price }}</span>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -206,7 +198,7 @@
                         <div class="p-4">
                            <div class="flex justify-between items-center mb-2">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ .Price }}</span>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -225,7 +217,7 @@
                         <div class="p-4">
                            <div class="flex justify-between items-center mb-2">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ .Price }}</span>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -244,7 +236,7 @@
                         <div class="p-4">
                            <div class="flex justify-between items-center mb-2">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ .Price }}</span>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -263,7 +255,7 @@
                         <div class="p-4">
                            <div class="flex justify-between items-center mb-2">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ .Price }}</span>
+                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>

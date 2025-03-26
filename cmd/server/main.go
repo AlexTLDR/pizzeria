@@ -38,6 +38,12 @@ var funcMap = template.FuncMap{
 		}
 		return dict, nil
 	},
+	"deref": func(f *float64) float64 {
+		if f == nil {
+			return 0.0
+		}
+		return *f
+	},
 }
 
 func main() {
