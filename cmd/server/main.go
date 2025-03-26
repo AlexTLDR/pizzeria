@@ -38,8 +38,8 @@ var funcMap = template.FuncMap{
 func main() {
 	menuItems := []MenuItem{
 		// Antipasti
-		{ID: "a1", Name: "Bruschetta", Description: "Toasted bread with fresh tomatoes, garlic, and basil", Price: 8.99, Category: "Antipasti", ImageURL: "/static/images/bruschetta.jpg"},
-		{ID: "a2", Name: "Caprese", Description: "Fresh mozzarella, tomatoes, and basil with balsamic glaze", Price: 10.99, Category: "Antipasti", ImageURL: "/static/images/caprese.jpg"},
+		{ID: "a1", Name: "Antipasto di Mare", Description: "mit Meeresfrüchte", Price: 16.50, Category: "Antipasti", ImageURL: "/static/images/menu/antipasto-di-mare.jpeg"},
+		{ID: "a2", Name: "Antipasto della Casa", Description: "Gemischte Vorspeisenplatte mit italienischen Wurstsorten und Caprese", Price: 14.50, Category: "Antipasti", ImageURL: "/static/images/menu/antipasto-della-casa.jpeg"},
 
 		// Insalate
 		{ID: "i1", Name: "Caesar Salad", Description: "Romaine lettuce, croutons, parmesan, and Caesar dressing", Price: 9.99, Category: "Insalate", ImageURL: "/static/images/caesar.jpg"},
