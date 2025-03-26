@@ -13,8 +13,13 @@ type MenuItem struct {
 	Name        string
 	Description string
 	Price       float64
+	SmallPrice  *float64
 	Category    string
 	ImageURL    string
+}
+
+func smallPrice(price float64) *float64 {
+	return &price
 }
 
 // Template function map with the dict function
@@ -53,8 +58,8 @@ func main() {
 
 		// Pizza
 		{ID: "p1", Name: "Pizzabrot", Description: "", Price: 12.99, Category: "Pizza", ImageURL: "/static/images/menu/pizzabrot.jpeg"},
-		{ID: "p2", Name: "Pomodoro", Description: "Tomaten, Käse", Price: 9.60, Category: "Pizza", ImageURL: "/static/images/menu/pomodoro.jpeg"},
-		{ID: "p3", Name: "Proscuitto", Description: "Vorderschinken", Price: 15.99, Category: "Pizza", ImageURL: "/static/images/menu/proscuitto.jpeg"},
+		{ID: "p2", Name: "Pomodoro", Description: "Tomaten, Käse", Price: 9.60, SmallPrice: smallPrice(4.60), Category: "Pizza", ImageURL: "/static/images/menu/pomodoro.jpeg"},
+		{ID: "p3", Name: "Proscuitto", Description: "Vorderschinken", Price: 15.99, SmallPrice: smallPrice(4.60), Category: "Pizza", ImageURL: "/static/images/menu/proscuitto.jpeg"},
 
 		// Spaghetti
 		{ID: "s1", Name: "Spaghetti Carbonara", Description: "Creamy sauce with pancetta and parmesan", Price: 13.99, Category: "Spaghetti", ImageURL: "/static/images/carbonara.jpg"},
