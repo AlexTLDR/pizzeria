@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <link href="/static/css/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        .font-garamond {
+            font-family: 'EB Garamond', serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <!-- Admin Header -->
+    <header class="bg-gray-800 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold font-garamond">Pizzeria Admin</h1>
+            <div class="flex items-center space-x-4">
+                <a href="/admin/dashboard" class="text-white hover:text-red-300 transition" title="Dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="/" class="text-white hover:text-red-300 transition" title="View Website">
+                    <i class="fas fa-globe"></i> View Site
+                </a>
+                <form action="/admin/logout" method="POST" class="m-0">
+                    <button type="submit" class="text-white hover:text-red-300 transition" title="Logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                </form>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 flex-grow">
+        <div class="mb-6">
+            <a href="/admin/dashboard" class="inline-flex items-center text-gray-600 hover:text-red-600">
+                <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-3xl font-bold text-gray-800 font-garamond mb-6">
+                {{ if .Item.ID }}Edit{{ else }}Add New{{ end }} Menu Item
+            </h2>
+
+            <!-- Flash messages if any -->
+            {{ if .Error }}
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+                <p>{{ .Error }}</p>
+            </div>
+            {{ end }}
+
+            <form action="{{ if .Item.ID }}/admin/menu/update/{{ .Item.ID }}{{ else }}/admin/menu/create{{ end }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Left Column -->
+                    <div class="space-y-6">
+                        <div>
+                            <label for="name" class="block text-gray-700 font-semibold mb-2">Name *</label>
+                            <input type="text" id="name" name="name" required value="{{ .Item.Name }}"
+                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        
+                        <div>
+                            <label for="description" class="block text-gray-700 font-semibold mb-2">Description</label>
+                            <textarea id="description" name="description" rows="4"
+                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">{{ .Item.Description }}</textarea>
+                        </div>
+                        
+                        <div>
+                            <label for="category" class="block text-gray-700 font-semibold mb-2">Category *</label>
+                            <select id="category" name="category" required
+                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                                <option value="">Select a category</option>
+                                <option value="Antipasti" {{ if eq .Item.Category "Antipasti" }}selected{{ end }}>Antipasti</option>
+                                <option value="Insalate" {{ if eq .Item.Category "Insalate" }}selected{{ end }}>Insalate</option>
+                                <option value="Pizza" {{ if eq .Item.Category "Pizza" }}selected{{ end }}>Pizza</option>
+                                <option value="Spaghetti" {{ if eq .Item.Category "Spaghetti" }}selected{{ end }}>Spaghetti</option>
+                                <option value="Penne" {{ if eq .Item.Category "Penne" }}selected{{ end }}>Penne</option>
+                                <option value="Rigatoni" {{ if eq .Item.Category "Rigatoni" }}selected{{ end }}>Rigatoni</option>
+                                <option value="Pasta al Forno" {{ if eq .Item.Category "Pasta al Forno" }}selected{{ end }}>Pasta al Forno</option>
+                                <option value="Pesce Fritto" {{ if eq .Item.Category "Pesce Fritto" }}selected{{ end }}>Pesce Fritto</option>
+                                <option value="Carne" {{ if eq .Item.Category "Carne" }}selected{{ end }}>Carne</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Column -->
+                    <div class="space-y-6">
+                        <div>
+                            <label for="price" class="block text-gray-700 font-semibold mb-2">Price (€) *</label>
+                            <input type="number" id="price" name="price" step="0.01" min="0" required value="{{ printf "%.2f" .Item.Price }}"
+                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        
+                        <div>
+                            <label for="small_price" class="block text-gray-700 font-semibold mb-2">Small Price (€) <span class="text-gray-500 text-sm">(Optional, for Pizza)</span></label>
+                            <input type="number" id="small_price" name="small_price" step="0.01" min="0" 
+                                value="{{ if .Item.SmallPrice }}{{ printf "%.2f" (deref .Item.SmallPrice) }}{{ end }}"
+                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                        </div>
+                        
+                        <div>
+                            <label for="image_url" class="block text-gray-700 font-semibold mb-2">Image URL</label>
+                            <input type="text" id="image_url" name="image_url" value="{{ .Item.ImageURL }}"
+                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" 
+                                placeholder="/static/images/menu/your-image.jpg">
+                            <p class="text-sm text-gray-500 mt-1">Enter the path to the image (e.g. /static/images/menu/your-image.jpg)</p>
+                        </div>
+                        
+                        <!-- Image Preview (if exists) -->
+                        {{ if .Item.ImageURL }}
+                        <div class="mt-4">
+                            <p class="text-gray-700 font-semibold mb-2">Current Image</p>
+                            <img src="{{ .Item.ImageURL }}" alt="{{ .Item.Name }}" class="h-32 w-auto rounded-md border border-gray-300">
+                        </div>
+                        {{ end }}
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-4 pt-4">
+                    <a href="/admin/dashboard" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">
+                        Cancel
+                    </a>
+                    <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                        {{ if .Item.ID }}Update{{ else }}Create{{ end }} Menu Item
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 text-white p-4 mt-auto">
+        <div class="container mx-auto text-center">
+            <p>&copy; {{ .Year }} Pizzeria Admin. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

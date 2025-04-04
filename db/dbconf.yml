@@ -1,0 +1,4 @@
+# SQLite configuration
+development:
+    driver: sqlite3
+    open: ./pizzeria.db?_foreign_keys=on # Use relative path from db directory

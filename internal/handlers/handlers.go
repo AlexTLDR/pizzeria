@@ -4,6 +4,7 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/AlexTLDR/pizzeria/internal/models"
@@ -50,7 +51,14 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
 // Admin login handlers
 func (m *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
-	err := m.TemplateCache["login.html"].Execute(w, nil)
+	data := map[string]interface{}{}
+
+	// Check for error parameter in URL
+	if r.URL.Query().Get("error") == "invalid" {
+		data["Error"] = true
+	}
+
+	err := m.TemplateCache["login.html"].Execute(w, data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -91,6 +99,19 @@ func (m *Repository) Login(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 }
 
+func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
+	// Clear the session cookie
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session",
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Now().Add(-1 * time.Hour),
+		HttpOnly: true,
+	})
+
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
 // Admin dashboard handler
 func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	menuItems, err := m.DB.GetAllMenuItems()
@@ -108,6 +129,136 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+// ShowCreateMenuItem displays the form to create a new menu item
+func (m *Repository) ShowCreateMenuItem(w http.ResponseWriter, r *http.Request) {
+	data := map[string]interface{}{
+		"Title": "Add New Menu Item",
+		"Item":  models.MenuItem{}, // Empty item for the form
+		"Year":  time.Now().Year(),
+	}
+
+	err := m.TemplateCache["menu-form.html"].Execute(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+// ShowEditMenuItem displays the form to edit an existing menu item
+func (m *Repository) ShowEditMenuItem(w http.ResponseWriter, r *http.Request) {
+	// Extract the ID from the URL path
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 4 {
+		http.Error(w, "Invalid item ID", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(parts[len(parts)-1])
+	if err != nil {
+		http.Error(w, "Invalid item ID", http.StatusBadRequest)
+		return
+	}
+
+	// Get the menu item
+	item, err := m.DB.GetMenuItemByID(id)
+	if err != nil {
+		http.Error(w, "Item not found", http.StatusNotFound)
+		return
+	}
+
+	data := map[string]interface{}{
+		"Title": "Edit Menu Item",
+		"Item":  item,
+		"Year":  time.Now().Year(),
+	}
+
+	err = m.TemplateCache["menu-form.html"].Execute(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+// UpdateMenuItem handles updating an existing menu item
+func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract the ID from the URL path
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 4 {
+		http.Error(w, "Invalid item ID", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(parts[len(parts)-1])
+	if err != nil {
+		http.Error(w, "Invalid item ID", http.StatusBadRequest)
+		return
+	}
+
+	err = r.ParseForm()
+	if err != nil {
+		http.Error(w, "Could not parse form", http.StatusBadRequest)
+		return
+	}
+
+	price, _ := strconv.ParseFloat(r.Form.Get("price"), 64)
+
+	var smallPrice *float64
+	if sp := r.Form.Get("small_price"); sp != "" {
+		spVal, _ := strconv.ParseFloat(sp, 64)
+		smallPrice = &spVal
+	}
+
+	item := models.MenuItem{
+		ID:          id,
+		Name:        r.Form.Get("name"),
+		Description: r.Form.Get("description"),
+		Price:       price,
+		SmallPrice:  smallPrice,
+		Category:    r.Form.Get("category"),
+		ImageURL:    r.Form.Get("image_url"),
+	}
+
+	err = m.DB.UpdateMenuItem(item)
+	if err != nil {
+		http.Error(w, "Could not update menu item", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+}
+
+// DeleteMenuItem handles deleting a menu item
+func (m *Repository) DeleteMenuItem(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract the ID from the URL path
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 4 {
+		http.Error(w, "Invalid item ID", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(parts[len(parts)-1])
+	if err != nil {
+		http.Error(w, "Invalid item ID", http.StatusBadRequest)
+		return
+	}
+
+	err = m.DB.DeleteMenuItem(id)
+	if err != nil {
+		http.Error(w, "Could not delete menu item", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 }
 
 // Menu item CRUD handlers
