@@ -12,6 +12,26 @@
         .font-garamond {
             font-family: 'EB Garamond', serif;
         }
+        .save-button {
+            background-color: #dc2626;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .save-button:hover {
+            background-color: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
@@ -54,7 +74,7 @@
             </div>
             {{ end }}
 
-            <form action="{{ if .Item.ID }}/admin/menu/update/{{ .Item.ID }}{{ else }}/admin/menu/create{{ end }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+            <form id="menu-item-form" action="{{ if .Item.ID }}/admin/menu/update/{{ .Item.ID }}{{ else }}/admin/menu/create{{ end }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Left Column -->
                     <div class="space-y-6">
@@ -103,12 +123,27 @@
                                 class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         
-                        <div>
-                            <label for="image_url" class="block text-gray-700 font-semibold mb-2">Image URL</label>
-                            <input type="text" id="image_url" name="image_url" value="{{ .Item.ImageURL }}"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500" 
-                                placeholder="/static/images/menu/your-image.jpg">
-                            <p class="text-sm text-gray-500 mt-1">Enter the path to the image (e.g. /static/images/menu/your-image.jpg)</p>
+                        <div class="border-2 border-green-200 rounded-lg p-4 bg-green-50">
+                            <div class="flex items-center mb-3">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <h3 class="text-lg font-semibold text-green-800">Image Upload</h3>
+                            </div>
+                            
+                            <div>
+                                <label for="image_upload" class="block text-gray-700 font-semibold mb-2">Select New Image</label>
+                                <input type="file" id="image_upload" name="image_upload" accept="image/*"
+                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <p class="text-sm text-gray-600 mt-1">Upload an image file (JPEG, PNG or GIF recommended)</p>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <label for="image_url" class="block text-gray-700 font-semibold mb-2">Current Image Path</label>
+                                <input type="text" id="image_url" name="image_url" value="{{ .Item.ImageURL }}" readonly
+                                    class="w-full px-4 py-2 border bg-gray-100 rounded-lg">
+                            </div>
+                            
                         </div>
                         
                         <!-- Image Preview (if exists) -->
@@ -121,13 +156,22 @@
                     </div>
                 </div>
                 
-                <div class="flex justify-end space-x-4 pt-4">
-                    <a href="/admin/dashboard" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition">
-                        Cancel
-                    </a>
-                    <button type="submit" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                        {{ if .Item.ID }}Update{{ else }}Create{{ end }} Menu Item
-                    </button>
+                <!-- Clear, large save button section -->
+                <div class="mt-8 bg-gray-100 p-6 rounded-lg border-2 border-gray-300">
+                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="flex items-center text-lg text-gray-700">
+                            <i class="fas fa-info-circle text-2xl mr-3 text-blue-600"></i>
+                            <span>Please click the RED button to save your changes</span>
+                        </div>
+                        <div class="flex gap-4">
+                            <a href="/admin/dashboard" class="px-5 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center">
+                                <i class="fas fa-arrow-left mr-2"></i> Cancel
+                            </a>
+                            <button type="submit" class="save-button">
+                                <i class="fas fa-save mr-3"></i> SAVE CHANGES
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </form>
         </div>

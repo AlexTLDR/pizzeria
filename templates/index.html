@@ -34,11 +34,16 @@
       <main>
          <!-- Dynamic Flash Messages -->
          {{ range .FlashMessages }}
-         <section class="py-4 {{ if eq .Type "success" }}bg-green-100{{ else }}bg-red-100{{ end }} mb-4">
-            <div class="container mx-auto px-6 text-center">
-               <p class="text-lg {{ if eq .Type "success" }}text-green-800{{ else }}text-red-800{{ end }} font-medium">
+         <section class="py-4 bg-cyan-100 border-t border-b border-cyan-200 mb-4 flash-message" data-id="{{ .ID }}">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+               <p class="text-lg text-gray-800 font-medium">
                   {{ .Message }}
                </p>
+               <button class="flash-close-btn text-gray-500 hover:text-gray-700 focus:outline-none" aria-label="Close">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+               </button>
             </div>
          </section>
          {{ end }}
@@ -279,5 +284,27 @@
          </section>
       </main>
       {{ template "footer" . }}
+      
+      <script>
+       // Flash message close functionality
+       document.addEventListener('DOMContentLoaded', function() {
+         const closeButtons = document.querySelectorAll('.flash-close-btn');
+         
+         closeButtons.forEach(button => {
+           button.addEventListener('click', function() {
+             const flashMessage = this.closest('.flash-message');
+             
+             // Add fade-out animation
+             flashMessage.style.transition = 'opacity 0.5s ease';
+             flashMessage.style.opacity = '0';
+             
+             // Remove the element after animation completes
+             setTimeout(() => {
+               flashMessage.remove();
+             }, 500);
+           });
+         });
+       });
+      </script>
    </body>
 </html>

@@ -1,8 +1,13 @@
 package handlers
 
 import (
+	"fmt"
 	"html/template"
+	"io"
+	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -40,9 +45,8 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	// Get active flash messages
 	activeMessages, err := m.DB.GetActiveFlashMessages()
 	if err != nil {
-		// Just log the error but continue
-		// In a production app, you would want to log this properly
-		// fmt.Println("Error getting flash messages:", err)
+		log.Printf("Error getting flash messages: %v", err)
+		activeMessages = []models.FlashMessage{}
 	}
 
 	data := map[string]interface{}{
@@ -129,16 +133,24 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get all flash messages for admin display
+	flashMessages, err := m.DB.GetAllFlashMessages()
+	if err != nil {
+		// Just log the error but continue
+		flashMessages = []models.FlashMessage{}
+	}
+
 	// Get success and error messages from the URL query parameters
 	success := r.URL.Query().Get("success")
 	errorMsg := r.URL.Query().Get("error")
 
 	data := map[string]interface{}{
-		"Title":   "Admin Dashboard",
-		"Menu":    menuItems,
-		"Year":    time.Now().Year(),
-		"Success": success,
-		"Error":   errorMsg,
+		"Title":         "Admin Dashboard",
+		"Menu":          menuItems,
+		"Year":          time.Now().Year(),
+		"Success":       success,
+		"Error":         errorMsg,
+		"FlashMessages": flashMessages,
 	}
 
 	err = m.TemplateCache["admin-dashboard.html"].Execute(w, data)
@@ -161,7 +173,7 @@ func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Parse form data
-	messageType := r.Form.Get("type")
+	messageType := "info" // Simplified to just use info type
 	messageText := r.Form.Get("message")
 	startDateStr := r.Form.Get("start_date")
 	endDateStr := r.Form.Get("end_date")
@@ -202,6 +214,35 @@ func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) 
 	}
 
 	http.Redirect(w, r, "/admin/dashboard?success=Announcement created successfully", http.StatusSeeOther)
+}
+
+// DeleteFlashMessage handles deleting a flash message
+func (m *Repository) DeleteFlashMessage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract the ID from the URL path
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 4 {
+		http.Error(w, "Invalid message ID", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(parts[len(parts)-1])
+	if err != nil {
+		http.Error(w, "Invalid message ID", http.StatusBadRequest)
+		return
+	}
+
+	err = m.DB.DeleteFlashMessage(id)
+	if err != nil {
+		http.Redirect(w, r, "/admin/dashboard?error=Failed to delete announcement", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/dashboard?success=Announcement deleted successfully", http.StatusSeeOther)
 }
 
 // ShowCreateMenuItem displays the form to create a new menu item
@@ -272,37 +313,84 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = r.ParseForm()
+	// Parse multipart form to handle file uploads
+	err = r.ParseMultipartForm(10 << 20) // 10 MB max memory
 	if err != nil {
 		http.Error(w, "Could not parse form", http.StatusBadRequest)
 		return
 	}
 
-	price, _ := strconv.ParseFloat(r.Form.Get("price"), 64)
+	// Get existing item to retrieve current imageURL
+	existingItem, err := m.DB.GetMenuItemByID(id)
+	if err != nil {
+		http.Error(w, "Item not found", http.StatusNotFound)
+		return
+	}
+
+	price, _ := strconv.ParseFloat(r.FormValue("price"), 64)
 
 	var smallPrice *float64
-	if sp := r.Form.Get("small_price"); sp != "" {
+	if sp := r.FormValue("small_price"); sp != "" {
 		spVal, _ := strconv.ParseFloat(sp, 64)
 		smallPrice = &spVal
 	}
 
+	// Initialize updated item with form values
 	item := models.MenuItem{
 		ID:          id,
-		Name:        r.Form.Get("name"),
-		Description: r.Form.Get("description"),
+		Name:        r.FormValue("name"),
+		Description: r.FormValue("description"),
 		Price:       price,
 		SmallPrice:  smallPrice,
-		Category:    r.Form.Get("category"),
-		ImageURL:    r.Form.Get("image_url"),
+		Category:    r.FormValue("category"),
+		ImageURL:    existingItem.ImageURL, // Default to current image URL
 	}
 
+	// Handle file upload if provided
+	file, handler, err := r.FormFile("image_upload")
+	if err == nil && handler != nil {
+		defer file.Close()
+
+		// Create a unique filename using timestamp
+		timestamp := time.Now().Unix()
+		filename := fmt.Sprintf("%d_%s", timestamp, handler.Filename)
+
+		// Ensure the directory exists
+		uploadDir := "static/images/menu"
+		if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+			os.MkdirAll(uploadDir, 0755)
+		}
+
+		// Create file path
+		filePath := filepath.Join(uploadDir, filename)
+
+		// Create the file
+		dst, err := os.Create(filePath)
+		if err != nil {
+			http.Error(w, "Failed to create file on server", http.StatusInternalServerError)
+			return
+		}
+		defer dst.Close()
+
+		// Copy the uploaded file to the created file on the filesystem
+		if _, err := io.Copy(dst, file); err != nil {
+			http.Error(w, "Failed to save uploaded file", http.StatusInternalServerError)
+			return
+		}
+
+		// Update the item's image URL
+		item.ImageURL = "/" + filePath // Add leading slash for web path
+	}
+
+	// Update the item in the database
 	err = m.DB.UpdateMenuItem(item)
 	if err != nil {
 		http.Error(w, "Could not update menu item", http.StatusInternalServerError)
 		return
 	}
 
-	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+	// Redirect to the dashboard with success message
+	http.Redirect(w, r, "/admin/dashboard?success=Menu item updated successfully", http.StatusSeeOther)
 }
 
 // DeleteMenuItem handles deleting a menu item
@@ -341,36 +429,76 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := r.ParseForm()
+	// Parse multipart form to handle file uploads
+	err := r.ParseMultipartForm(10 << 20) // 10 MB max memory
 	if err != nil {
 		http.Error(w, "Could not parse form", http.StatusBadRequest)
 		return
 	}
 
-	price, _ := strconv.ParseFloat(r.Form.Get("price"), 64)
+	price, _ := strconv.ParseFloat(r.FormValue("price"), 64)
 
 	var smallPrice *float64
-	if sp := r.Form.Get("small_price"); sp != "" {
+	if sp := r.FormValue("small_price"); sp != "" {
 		spVal, _ := strconv.ParseFloat(sp, 64)
 		smallPrice = &spVal
 	}
 
+	// Initialize item with form values
 	item := models.MenuItem{
-		Name:        r.Form.Get("name"),
-		Description: r.Form.Get("description"),
+		Name:        r.FormValue("name"),
+		Description: r.FormValue("description"),
 		Price:       price,
 		SmallPrice:  smallPrice,
-		Category:    r.Form.Get("category"),
-		ImageURL:    r.Form.Get("image_url"),
+		Category:    r.FormValue("category"),
+		ImageURL:    r.FormValue("image_url"), // Default to current URL if exists
 	}
 
+	// Handle file upload if provided
+	file, handler, err := r.FormFile("image_upload")
+	if err == nil && handler != nil {
+		defer file.Close()
+
+		// Create a unique filename using timestamp
+		timestamp := time.Now().Unix()
+		filename := fmt.Sprintf("%d_%s", timestamp, handler.Filename)
+
+		// Ensure the directory exists
+		uploadDir := "static/images/menu"
+		if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+			os.MkdirAll(uploadDir, 0755)
+		}
+
+		// Create file path
+		filePath := filepath.Join(uploadDir, filename)
+
+		// Create the file
+		dst, err := os.Create(filePath)
+		if err != nil {
+			http.Error(w, "Failed to create file on server", http.StatusInternalServerError)
+			return
+		}
+		defer dst.Close()
+
+		// Copy the uploaded file to the created file on the filesystem
+		if _, err := io.Copy(dst, file); err != nil {
+			http.Error(w, "Failed to save uploaded file", http.StatusInternalServerError)
+			return
+		}
+
+		// Update the item's image URL
+		item.ImageURL = "/" + filePath // Add leading slash for web path
+	}
+
+	// Save the menu item to the database
 	_, err = m.DB.InsertMenuItem(item)
 	if err != nil {
 		http.Error(w, "Could not create menu item", http.StatusInternalServerError)
 		return
 	}
 
-	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+	// Redirect to the dashboard with success message
+	http.Redirect(w, r, "/admin/dashboard?success=Menu item created successfully", http.StatusSeeOther)
 }
 
 func (m *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) {

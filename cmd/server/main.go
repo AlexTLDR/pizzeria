@@ -110,6 +110,7 @@ func main() {
 	adminMux.HandleFunc("/admin/menu/delete/", handlers.Repo.DeleteMenuItem)
 
 	adminMux.HandleFunc("/admin/flash-message", handlers.Repo.CreateFlashMessage)
+	adminMux.HandleFunc("/admin/flash-message/delete/", handlers.Repo.DeleteFlashMessage)
 	adminMux.HandleFunc("/admin/logout", handlers.Repo.Logout)
 	http.Handle("/admin/", middleware.Auth(adminMux))
 
