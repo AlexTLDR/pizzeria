@@ -63,6 +63,7 @@ func main() {
 		"login.html":           template.Must(template.New("login.html").Funcs(funcMap).ParseFiles("templates/login.html")),
 		"admin-dashboard.html": template.Must(template.New("admin-dashboard.html").Funcs(funcMap).ParseFiles("templates/admin-dashboard.html")),
 		"menu-form.html":       template.Must(template.New("menu-form.html").Funcs(funcMap).ParseFiles("templates/menu-form.html")),
+		"user-management.html": template.Must(template.New("user-management.html").Funcs(funcMap).ParseFiles("templates/user-management.html")),
 	}
 
 	dbModel := models.DBModel{DB: database}
@@ -103,15 +104,28 @@ func main() {
 
 	adminMux := http.NewServeMux()
 	adminMux.HandleFunc("/admin/dashboard", handlers.Repo.AdminDashboard)
+
+	// Menu management routes
 	adminMux.HandleFunc("/admin/menu/new", handlers.Repo.ShowCreateMenuItem)
 	adminMux.HandleFunc("/admin/menu/create", handlers.Repo.CreateMenuItem)
 	adminMux.HandleFunc("/admin/menu/edit/", handlers.Repo.ShowEditMenuItem)
 	adminMux.HandleFunc("/admin/menu/update/", handlers.Repo.UpdateMenuItem)
 	adminMux.HandleFunc("/admin/menu/delete/", handlers.Repo.DeleteMenuItem)
 
+	// Flash message routes
 	adminMux.HandleFunc("/admin/flash-message", handlers.Repo.CreateFlashMessage)
 	adminMux.HandleFunc("/admin/flash-message/delete/", handlers.Repo.DeleteFlashMessage)
+
+	// User management routes
+	adminMux.HandleFunc("/admin/users", handlers.Repo.ShowUserManagement)
+	adminMux.HandleFunc("/admin/users/create", handlers.Repo.CreateUser)
+	adminMux.HandleFunc("/admin/users/update/", handlers.Repo.UpdateUser)
+	adminMux.HandleFunc("/admin/users/delete/", handlers.Repo.DeleteUser)
+	adminMux.HandleFunc("/admin/users/change-password", handlers.Repo.ChangePassword)
+
+	// Logout route
 	adminMux.HandleFunc("/admin/logout", handlers.Repo.Logout)
+
 	http.Handle("/admin/", middleware.Auth(adminMux))
 
 	log.Println("Server starting on http://localhost:8080")

@@ -343,7 +343,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 		Price:       price,
 		SmallPrice:  smallPrice,
 		Category:    r.FormValue("category"),
-		ImageURL:    existingItem.ImageURL, // Default to current image URL
+		ImageURL:    existingItem.ImageURL,
 	}
 
 	// Handle file upload if provided
@@ -546,6 +546,278 @@ func (m *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/admin/users", http.StatusSeeOther)
+}
+
+// User management handlers
+func (m *Repository) ShowUserManagement(w http.ResponseWriter, r *http.Request) {
+	// Get all users
+	users, err := m.DB.GetAllUsers()
+	if err != nil {
+		http.Error(w, "Database error", http.StatusInternalServerError)
+		return
+	}
+
+	// Get current user ID from the cookie (in a real app, you would use a proper session)
+	// For now, we're just getting the username from the active session
+	var currentUser models.User
+
+	// In a real app with proper sessions, you would get the user ID from the session
+	// Here we're just using the first user as a placeholder for the current user
+	if len(users) > 0 {
+		currentUser = users[0]
+	}
+
+	// Get success and error messages from the URL query parameters
+	success := r.URL.Query().Get("success")
+	errorMsg := r.URL.Query().Get("error")
+
+	data := map[string]interface{}{
+		"Title":       "User Management",
+		"Users":       users,
+		"CurrentUser": currentUser,
+		"Success":     success,
+		"Error":       errorMsg,
+		"Year":        time.Now().Year(),
+	}
+
+	err = m.TemplateCache["user-management.html"].Execute(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+// CreateUser handles creating a new user
+func (m *Repository) CreateUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Could not parse form", http.StatusBadRequest)
+		return
+	}
+
+	username := r.Form.Get("username")
+	password := r.Form.Get("password")
+
+	if username == "" || password == "" {
+		http.Redirect(w, r, "/admin/users?error=Username and password cannot be empty", http.StatusSeeOther)
+		return
+	}
+
+	// Check if username already exists
+	_, err = m.DB.GetUserByUsername(username)
+	if err == nil {
+		// User exists
+		http.Redirect(w, r, "/admin/users?error=Username already exists", http.StatusSeeOther)
+		return
+	}
+
+	// Hash the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=Password hashing error", http.StatusSeeOther)
+		return
+	}
+
+	user := models.User{
+		Username:     username,
+		PasswordHash: string(hashedPassword),
+	}
+
+	_, err = m.DB.InsertUser(user)
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=Could not create user", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/users?success=User created successfully", http.StatusSeeOther)
+}
+
+// UpdateUser handles updating an existing user
+func (m *Repository) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract the ID from the URL path
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 4 {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(parts[len(parts)-1])
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	// Get the existing user
+	user, err := m.DB.GetUserByID(id)
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=User not found", http.StatusSeeOther)
+		return
+	}
+
+	err = r.ParseForm()
+	if err != nil {
+		http.Error(w, "Could not parse form", http.StatusBadRequest)
+		return
+	}
+
+	// Get form values
+	username := r.Form.Get("username")
+	password := r.Form.Get("password")
+
+	// Validate username
+	if username == "" {
+		http.Redirect(w, r, "/admin/users?error=Username cannot be empty", http.StatusSeeOther)
+		return
+	}
+
+	// If username is changed, check if it's unique
+	if username != user.Username {
+		// Check if username already exists
+		_, err = m.DB.GetUserByUsername(username)
+		if err == nil {
+			// User exists
+			http.Redirect(w, r, "/admin/users?error=Username already exists", http.StatusSeeOther)
+			return
+		}
+	}
+
+	// Update username
+	user.Username = username
+
+	// Update password if provided
+	if password != "" {
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+		if err != nil {
+			http.Redirect(w, r, "/admin/users?error=Password hashing error", http.StatusSeeOther)
+			return
+		}
+		user.PasswordHash = string(hashedPassword)
+	}
+
+	// Save changes
+	err = m.DB.UpdateUser(user)
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=Could not update user", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/users?success=User updated successfully", http.StatusSeeOther)
+}
+
+// DeleteUser handles deleting a user
+func (m *Repository) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Extract the ID from the URL path
+	parts := strings.Split(r.URL.Path, "/")
+	if len(parts) < 4 {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(parts[len(parts)-1])
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	// Don't allow deleting the last user
+	users, err := m.DB.GetAllUsers()
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=Database error", http.StatusSeeOther)
+		return
+	}
+
+	if len(users) <= 1 {
+		http.Redirect(w, r, "/admin/users?error=Cannot delete the last user", http.StatusSeeOther)
+		return
+	}
+
+	err = m.DB.DeleteUser(id)
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=Could not delete user", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/users?success=User deleted successfully", http.StatusSeeOther)
+}
+
+// ChangePassword allows a user to change their own password
+func (m *Repository) ChangePassword(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Could not parse form", http.StatusBadRequest)
+		return
+	}
+
+	userID, err := strconv.Atoi(r.Form.Get("user_id"))
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=Invalid user ID", http.StatusSeeOther)
+		return
+	}
+
+	currentPassword := r.Form.Get("current_password")
+	newPassword := r.Form.Get("new_password")
+	confirmPassword := r.Form.Get("confirm_password")
+
+	// Validate inputs
+	if currentPassword == "" || newPassword == "" || confirmPassword == "" {
+		http.Redirect(w, r, "/admin/users?error=All password fields are required", http.StatusSeeOther)
+		return
+	}
+
+	if newPassword != confirmPassword {
+		http.Redirect(w, r, "/admin/users?error=New passwords do not match", http.StatusSeeOther)
+		return
+	}
+
+	// Get user
+	user, err := m.DB.GetUserByID(userID)
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=User not found", http.StatusSeeOther)
+		return
+	}
+
+	// Verify current password
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(currentPassword))
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=Current password is incorrect", http.StatusSeeOther)
+		return
+	}
+
+	// Hash new password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), 12)
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=Password hashing error", http.StatusSeeOther)
+		return
+	}
+
+	// Update password
+	user.PasswordHash = string(hashedPassword)
+	err = m.DB.UpdateUser(user)
+	if err != nil {
+		http.Redirect(w, r, "/admin/users?error=Could not update password", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/users?success=Password changed successfully", http.StatusSeeOther)
 }
 
 // Helper function to safely delete image files

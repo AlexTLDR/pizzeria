@@ -174,7 +174,6 @@ func (m *DBModel) DeleteMenuItem(id int) error {
 }
 
 // User Methods
-// User Methods
 func (m *DBModel) GetUserByUsername(username string) (User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
@@ -220,6 +219,109 @@ func (m *DBModel) InsertUser(user User) (int, error) {
 		return 0, err
 	}
 	return newID, nil
+}
+
+// Get all users
+func (m *DBModel) GetAllUsers() ([]User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT id, username, password_hash, created_at, updated_at
+              FROM users ORDER BY username`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var users []User
+
+	for rows.Next() {
+		var user User
+		err := rows.Scan(
+			&user.ID,
+			&user.Username,
+			&user.PasswordHash,
+			&user.CreatedAt,
+			&user.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+// Get user by ID
+func (m *DBModel) GetUserByID(id int) (User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT id, username, password_hash, created_at, updated_at
+              FROM users WHERE id = ?`
+
+	var user User
+	row := m.DB.QueryRowContext(ctx, query, id)
+
+	err := row.Scan(
+		&user.ID,
+		&user.Username,
+		&user.PasswordHash,
+		&user.CreatedAt,
+		&user.UpdatedAt,
+	)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}
+
+// Update user information
+func (m *DBModel) UpdateUser(user User) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `UPDATE users SET
+             username = ?,
+             password_hash = ?,
+             updated_at = ?
+             WHERE id = ?`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		user.Username,
+		user.PasswordHash,
+		time.Now(),
+		user.ID,
+	)
+
+	return err
+}
+
+// Delete user
+func (m *DBModel) DeleteUser(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `DELETE FROM users WHERE id = ?`
+	_, err := m.DB.ExecContext(ctx, stmt, id)
+	return err
+}
+
+// Count total number of users
+func (m *DBModel) GetUserCount() (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	var count int
+	query := `SELECT COUNT(*) FROM users`
+	err := m.DB.QueryRowContext(ctx, query).Scan(&count)
+
+	return count, err
 }
 
 // FlashMessage Methods

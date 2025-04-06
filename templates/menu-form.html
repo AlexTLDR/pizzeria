@@ -3,184 +3,250 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ .Title }}</title>
-    <link href="/static/css/output.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>{{.Title}} - Pizzeria Ristorante</title>
+    <link rel="stylesheet" href="/static/css/output.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        .font-garamond {
-            font-family: 'EB Garamond', serif;
-        }
-        .save-button {
-            background-color: #dc2626;
-            color: white;
-            font-size: 1.5rem;
-            font-weight: bold;
-            padding: 1rem 2rem;
-            border-radius: 0.5rem;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        /* Custom file upload styling */
+        .custom-file-upload {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
             cursor: pointer;
-            transition: all 0.3s ease;
+        }
+        .custom-file-upload input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            cursor: pointer;
+            display: block;
+        }
+        .file-upload-btn {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
+            text-align: center;
+            width: 100%;
+            transition: all 0.3s;
         }
-        .save-button:hover {
-            background-color: #b91c1c;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        .file-upload-btn:hover {
+            opacity: 0.9;
+        }
+        .filename-display {
+            margin-top: 10px;
+            font-size: 0.875rem;
+            color: #4f46e5;
+            word-break: break-all;
+        }
+        
+        /* Image modal/lightbox styling */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 50px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            color: #bbb;
+        }
+        .current-image {
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .current-image:hover {
+            opacity: 0.8;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col">
-    <!-- Admin Header -->
-    <header class="bg-gray-800 text-white p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold font-garamond">Pizzeria Admin</h1>
-            <div class="flex items-center space-x-4">
-                <a href="/admin/dashboard" class="text-white hover:text-red-300 transition" title="Dashboard">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto p-4">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">{{.Title}}</h1>
+            <div>
+                <a href="/admin/dashboard" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded mr-2" 
+                   style="background-color: #6b7280 !important; color: white !important; padding: 8px 16px; border-radius: 4px; margin-right: 8px; text-decoration: none; display: inline-block;">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
                 </a>
-                <a href="/" class="text-white hover:text-red-300 transition" title="View Website">
-                    <i class="fas fa-globe"></i> View Site
-                </a>
-                <form action="/admin/logout" method="POST" class="m-0">
-                    <button type="submit" class="text-white hover:text-red-300 transition" title="Logout">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
-                </form>
             </div>
         </div>
-    </header>
 
-    <main class="container mx-auto p-4 flex-grow">
-        <div class="mb-6">
-            <a href="/admin/dashboard" class="inline-flex items-center text-gray-600 hover:text-red-600">
-                <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
-            </a>
-        </div>
-
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h2 class="text-3xl font-bold text-gray-800 font-garamond mb-6">
-                {{ if .Item.ID }}Edit{{ else }}Add New{{ end }} Menu Item
-            </h2>
-
-            <!-- Flash messages if any -->
-            {{ if .Error }}
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-                <p>{{ .Error }}</p>
-            </div>
-            {{ end }}
-
-            <form id="menu-item-form" action="{{ if .Item.ID }}/admin/menu/update/{{ .Item.ID }}{{ else }}/admin/menu/create{{ end }}" method="POST" enctype="multipart/form-data" class="space-y-6">
+        <!-- Menu Item Form -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <form action="{{ if .Item.ID }}/admin/menu/update/{{.Item.ID}}{{ else }}/admin/menu/create{{ end }}" 
+                  method="POST" enctype="multipart/form-data" class="space-y-6">
+                
+                <!-- Item Details Section -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Left Column -->
-                    <div class="space-y-6">
-                        <div>
-                            <label for="name" class="block text-gray-700 font-semibold mb-2">Name *</label>
-                            <input type="text" id="name" name="name" required value="{{ .Item.Name }}"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                        </div>
-                        
-                        <div>
-                            <label for="description" class="block text-gray-700 font-semibold mb-2">Description</label>
-                            <textarea id="description" name="description" rows="4"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">{{ .Item.Description }}</textarea>
-                        </div>
-                        
-                        <div>
-                            <label for="category" class="block text-gray-700 font-semibold mb-2">Category *</label>
-                            <select id="category" name="category" required
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                                <option value="">Select a category</option>
-                                <option value="Antipasti" {{ if eq .Item.Category "Antipasti" }}selected{{ end }}>Antipasti</option>
-                                <option value="Insalate" {{ if eq .Item.Category "Insalate" }}selected{{ end }}>Insalate</option>
-                                <option value="Pizza" {{ if eq .Item.Category "Pizza" }}selected{{ end }}>Pizza</option>
-                                <option value="Spaghetti" {{ if eq .Item.Category "Spaghetti" }}selected{{ end }}>Spaghetti</option>
-                                <option value="Penne" {{ if eq .Item.Category "Penne" }}selected{{ end }}>Penne</option>
-                                <option value="Rigatoni" {{ if eq .Item.Category "Rigatoni" }}selected{{ end }}>Rigatoni</option>
-                                <option value="Pasta al Forno" {{ if eq .Item.Category "Pasta al Forno" }}selected{{ end }}>Pasta al Forno</option>
-                                <option value="Pesce Fritto" {{ if eq .Item.Category "Pesce Fritto" }}selected{{ end }}>Pesce Fritto</option>
-                                <option value="Carne" {{ if eq .Item.Category "Carne" }}selected{{ end }}>Carne</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label for="name" class="block text-gray-700 font-medium mb-2">Item Name</label>
+                        <input type="text" id="name" name="name" value="{{.Item.Name}}" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                     </div>
                     
-                    <!-- Right Column -->
-                    <div class="space-y-6">
-                        <div>
-                            <label for="price" class="block text-gray-700 font-semibold mb-2">Price (€) *</label>
-                            <input type="number" id="price" name="price" step="0.01" min="0" required value="{{ printf "%.2f" .Item.Price }}"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                        </div>
-                        
-                        <div>
-                            <label for="small_price" class="block text-gray-700 font-semibold mb-2">Small Price (€) <span class="text-gray-500 text-sm">(Optional, for Pizza)</span></label>
-                            <input type="number" id="small_price" name="small_price" step="0.01" min="0" 
-                                value="{{ if .Item.SmallPrice }}{{ printf "%.2f" (deref .Item.SmallPrice) }}{{ end }}"
-                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
-                        </div>
-                        
-                        <div class="border-2 border-green-200 rounded-lg p-4 bg-green-50">
-                            <div class="flex items-center mb-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <h3 class="text-lg font-semibold text-green-800">Image Upload</h3>
-                            </div>
-                            
-                            <div>
-                                <label for="image_upload" class="block text-gray-700 font-semibold mb-2">Select New Image</label>
-                                <input type="file" id="image_upload" name="image_upload" accept="image/*"
-                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
-                                <p class="text-sm text-gray-600 mt-1">Upload an image file (JPEG, PNG or GIF recommended)</p>
-                            </div>
-                            
-                            <div class="mt-4">
-                                <label for="image_url" class="block text-gray-700 font-semibold mb-2">Current Image Path</label>
-                                <input type="text" id="image_url" name="image_url" value="{{ .Item.ImageURL }}" readonly
-                                    class="w-full px-4 py-2 border bg-gray-100 rounded-lg">
-                            </div>
-                            
-                        </div>
-                        
-                        <!-- Image Preview (if exists) -->
-                        {{ if .Item.ImageURL }}
-                        <div class="mt-4">
-                            <p class="text-gray-700 font-semibold mb-2">Current Image</p>
-                            <img src="{{ .Item.ImageURL }}" alt="{{ .Item.Name }}" class="h-32 w-auto rounded-md border border-gray-300">
-                        </div>
-                        {{ end }}
+                    <div>
+                        <label for="category" class="block text-gray-700 font-medium mb-2">Category</label>
+                        <select id="category" name="category" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="" disabled {{ if not .Item.Category }}selected{{ end }}>Select a category</option>
+                            <option value="Pizza" {{ if eq .Item.Category "Pizza" }}selected{{ end }}>Pizza</option>
+                            <option value="Pasta" {{ if eq .Item.Category "Pasta" }}selected{{ end }}>Pasta</option>
+                            <option value="Antipasti" {{ if eq .Item.Category "Antipasti" }}selected{{ end }}>Antipasti</option>
+                            <option value="Salads" {{ if eq .Item.Category "Salads" }}selected{{ end }}>Salads</option>
+                            <option value="Desserts" {{ if eq .Item.Category "Desserts" }}selected{{ end }}>Desserts</option>
+                            <option value="Drinks" {{ if eq .Item.Category "Drinks" }}selected{{ end }}>Drinks</option>
+                        </select>
                     </div>
                 </div>
                 
-                <!-- Clear, large save button section -->
-                <div class="mt-8 bg-gray-100 p-6 rounded-lg border-2 border-gray-300">
-                    <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="flex items-center text-lg text-gray-700">
-                            <i class="fas fa-info-circle text-2xl mr-3 text-blue-600"></i>
-                            <span>Please click the RED button to save your changes</span>
-                        </div>
-                        <div class="flex gap-4">
-                            <a href="/admin/dashboard" class="px-5 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center">
-                                <i class="fas fa-arrow-left mr-2"></i> Cancel
-                            </a>
-                            <button type="submit" class="save-button">
-                                <i class="fas fa-save mr-3"></i> SAVE CHANGES
-                            </button>
+                <div>
+                    <label for="description" class="block text-gray-700 font-medium mb-2">Description</label>
+                    <textarea id="description" name="description" rows="3"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">{{.Item.Description}}</textarea>
+                </div>
+                
+                <!-- Pricing Section -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="price" class="block text-gray-700 font-medium mb-2">Regular Price (€)</label>
+                        <input type="number" id="price" name="price" value="{{.Item.Price}}" step="0.01" min="0" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label for="small_price" class="block text-gray-700 font-medium mb-2">
+                            Small Size Price (€) <span class="text-gray-500 text-sm">(Optional)</span>
+                        </label>
+                        <input type="number" id="small_price" name="small_price" 
+                               value="{{ if .Item.SmallPrice }}{{.Item.SmallPrice}}{{ end }}" 
+                               step="0.01" min="0"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+                
+                <!-- Image Section -->
+                <div class="space-y-4">
+                    <label class="block text-gray-700 font-medium mb-2">Item Image</label>
+                    
+                    {{if .Item.ImageURL}}
+                    <div class="flex items-center space-x-4 mb-4">
+                        <img src="{{.Item.ImageURL}}" alt="{{.Item.Name}}" 
+                             class="h-24 w-24 object-cover rounded-md border border-gray-300 current-image"
+                             style="height: 96px; width: 96px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;"
+                             onclick="openImageModal('{{.Item.ImageURL}}')">
+                        <div class="text-sm text-gray-500">Current image</div>
+                    </div>
+                    {{end}}
+                    
+                    <div class="border border-dashed border-gray-300 rounded-md p-6">
+                        <div class="text-center">
+                            <!-- Improved Upload Button -->
+                            <label class="custom-file-upload w-full">
+                                <div class="file-upload-btn bg-blue-500 text-white py-4 px-6 rounded-md"
+                                     style="background-color: #3b82f6 !important; color: white !important; padding: 16px 24px; border-radius: 6px;">
+                                    <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
+                                    <span class="block font-bold">Click to Upload Image</span>
+                                    <span class="text-sm opacity-80">JPG, PNG or GIF up to 5MB</span>
+                                </div>
+                                <input type="file" id="image_upload" name="image_upload" accept="image/*" onchange="updateFilename(this)">
+                            </label>
+                            
+                            <!-- Filename display -->
+                            <div id="filename_display" class="filename-display hidden"></div>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Buttons -->
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+                    <a href="/admin/dashboard" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded"
+                       style="background-color: #d1d5db !important; color: #1f2937 !important; padding: 8px 16px; border-radius: 4px; text-decoration: none;">
+                        <i class="fas fa-times mr-1"></i> Cancel
+                    </a>
+                    
+                    <button type="submit" class="{{ if .Item.ID }}bg-blue-500 hover:bg-blue-600{{ else }}bg-green-500 hover:bg-green-600{{ end }} text-white py-2 px-4 rounded"
+                            style="{{ if .Item.ID }}background-color: #3b82f6 !important;{{ else }}background-color: #22c55e !important;{{ end }} color: white !important; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                        <i class="fas fa-save mr-1"></i> {{ if .Item.ID }}Update Menu Item{{ else }}Create Menu Item{{ end }}
+                    </button>
+                </div>
             </form>
         </div>
-    </main>
+    </div>
 
-    <footer class="bg-gray-800 text-white p-4 mt-auto">
-        <div class="container mx-auto text-center">
-            <p>&copy; {{ .Year }} Pizzeria Admin. All rights reserved.</p>
-        </div>
-    </footer>
+    <!-- Image Modal/Lightbox -->
+    <div id="imageModal" class="image-modal">
+        <span class="modal-close" onclick="closeImageModal()">&times;</span>
+        <img class="modal-content" id="modalImage">
+    </div>
+
+    <script>
+        function updateFilename(input) {
+            const filenameDisplay = document.getElementById('filename_display');
+            if (input.files && input.files[0]) {
+                filenameDisplay.textContent = "Selected: " + input.files[0].name;
+                filenameDisplay.classList.remove('hidden');
+            } else {
+                filenameDisplay.classList.add('hidden');
+            }
+        }
+        
+        // Image modal functions
+        function openImageModal(imageSrc) {
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            modal.style.display = "block";
+            modalImg.src = imageSrc;
+            
+            // Also close modal when clicking outside the image
+            modal.onclick = function(event) {
+                if (event.target === modal) {
+                    closeImageModal();
+                }
+            };
+            
+            // Add keyboard support to close with Escape key
+            document.addEventListener('keydown', handleEscapeKey);
+        }
+        
+        function closeImageModal() {
+            document.getElementById('imageModal').style.display = "none";
+            document.removeEventListener('keydown', handleEscapeKey);
+        }
+        
+        function handleEscapeKey(event) {
+            if (event.key === "Escape") {
+                closeImageModal();
+            }
+        }
+    </script>
 </body>
 </html>
