@@ -10,10 +10,44 @@
         .font-garamond {
             font-family: 'EB Garamond', serif;
         }
+        .login-button {
+            background-color: #e53e3e; /* red-600 equivalent */
+            color: white;
+            font-weight: bold;
+            padding: 10px 16px;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            border: none;
+        }
+        .login-button:hover {
+            background-color: #c53030; /* red-700 equivalent */
+        }
+        .input-field {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d2d6dc;
+            border-radius: 6px;
+            max-width: 320px;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+        }
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+    <div class="login-container">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-800 font-garamond">Pizzeria Admin</h1>
             <p class="text-gray-600">Login to manage your menu</p>
@@ -26,19 +60,16 @@
         {{end}}
         
         <form action="/login" method="POST" class="space-y-4">
-            <div>
-                <label for="username" class="block text-gray-700 font-semibold mb-2">Username</label>
-                <input type="text" id="username" name="username" required 
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+            <div class="flex flex-col items-center">
+                <label for="username" class="block text-gray-700 font-semibold mb-2 self-start">Username</label>
+                <input type="text" id="username" name="username" required class="input-field">
             </div>
-            <div>
-                <label for="password" class="block text-gray-700 font-semibold mb-2">Password</label>
-                <input type="password" id="password" name="password" required 
-                       class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+            <div class="flex flex-col items-center">
+                <label for="password" class="block text-gray-700 font-semibold mb-2 self-start">Password</label>
+                <input type="password" id="password" name="password" required class="input-field">
             </div>
-            <div>
-                <button type="submit" 
-                        class="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-200">
+            <div class="mt-6">
+                <button type="submit" class="login-button">
                     Login
                 </button>
             </div>
