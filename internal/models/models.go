@@ -27,6 +27,17 @@ type User struct {
 	UpdatedAt time.Time
 }
 
+type FlashMessage struct {
+	ID        int
+	Type      string // "success" or "error"
+	Message   string
+	StartDate time.Time
+	EndDate   time.Time
+	Active    bool
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
 type DBModel struct {
 	DB *sql.DB
 }
@@ -208,6 +219,117 @@ func (m *DBModel) InsertUser(user User) (int, error) {
 	if err != nil {
 		return 0, err
 	}
+	return newID, nil
+}
+
+// FlashMessage Methods
+func (m *DBModel) CreateFlashMessage(message FlashMessage) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `INSERT INTO flash_messages (type, message, start_date, end_date, active, created_at, updated_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?)
+		RETURNING id`
+
+	var newID int
+	err := m.DB.QueryRowContext(ctx, stmt,
+		message.Type,
+		message.Message,
+		message.StartDate,
+		message.EndDate,
+		message.Active,
+		time.Now(),
+		time.Now(),
+	).Scan(&newID)
+
+	if err != nil {
+		return 0, err
+	}
 
 	return newID, nil
+}
+
+func (m *DBModel) GetActiveFlashMessages() ([]FlashMessage, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	now := time.Now()
+	query := `SELECT id, type, message, start_date, end_date, active, created_at, updated_at
+		FROM flash_messages
+		WHERE active = 1 AND start_date <= ? AND end_date >= ?
+		ORDER BY created_at DESC`
+
+	rows, err := m.DB.QueryContext(ctx, query, now, now)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var messages []FlashMessage
+
+	for rows.Next() {
+		var msg FlashMessage
+		err := rows.Scan(
+			&msg.ID,
+			&msg.Type,
+			&msg.Message,
+			&msg.StartDate,
+			&msg.EndDate,
+			&msg.Active,
+			&msg.CreatedAt,
+			&msg.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		messages = append(messages, msg)
+	}
+
+	return messages, nil
+}
+
+func (m *DBModel) GetAllFlashMessages() ([]FlashMessage, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	query := `SELECT id, type, message, start_date, end_date, active, created_at, updated_at
+		FROM flash_messages
+		ORDER BY created_at DESC`
+
+	rows, err := m.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var messages []FlashMessage
+
+	for rows.Next() {
+		var msg FlashMessage
+		err := rows.Scan(
+			&msg.ID,
+			&msg.Type,
+			&msg.Message,
+			&msg.StartDate,
+			&msg.EndDate,
+			&msg.Active,
+			&msg.CreatedAt,
+			&msg.UpdatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		messages = append(messages, msg)
+	}
+
+	return messages, nil
+}
+
+func (m *DBModel) DeleteFlashMessage(id int) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `DELETE FROM flash_messages WHERE id = ?`
+	_, err := m.DB.ExecContext(ctx, stmt, id)
+	return err
 }

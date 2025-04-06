@@ -37,10 +37,19 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get active flash messages
+	activeMessages, err := m.DB.GetActiveFlashMessages()
+	if err != nil {
+		// Just log the error but continue
+		// In a production app, you would want to log this properly
+		// fmt.Println("Error getting flash messages:", err)
+	}
+
 	data := map[string]interface{}{
-		"Title": "Pizzeria Ristorante - Authentic Italian Cuisine",
-		"Menu":  menuItems,
-		"Year":  time.Now().Year(),
+		"Title":         "Pizzeria Ristorante - Authentic Italian Cuisine",
+		"Menu":          menuItems,
+		"Year":          time.Now().Year(),
+		"FlashMessages": activeMessages,
 	}
 
 	err = m.TemplateCache["index.html"].Execute(w, data)
@@ -120,15 +129,79 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get success and error messages from the URL query parameters
+	success := r.URL.Query().Get("success")
+	errorMsg := r.URL.Query().Get("error")
+
 	data := map[string]interface{}{
-		"Title": "Admin Dashboard",
-		"Menu":  menuItems,
+		"Title":   "Admin Dashboard",
+		"Menu":    menuItems,
+		"Year":    time.Now().Year(),
+		"Success": success,
+		"Error":   errorMsg,
 	}
 
 	err = m.TemplateCache["admin-dashboard.html"].Execute(w, data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+}
+
+// CreateFlashMessage handles the creation of a new flash message
+func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	err := r.ParseForm()
+	if err != nil {
+		http.Error(w, "Could not parse form", http.StatusBadRequest)
+		return
+	}
+
+	// Parse form data
+	messageType := r.Form.Get("type")
+	messageText := r.Form.Get("message")
+	startDateStr := r.Form.Get("start_date")
+	endDateStr := r.Form.Get("end_date")
+	active := r.Form.Get("active") == "on"
+
+	// Parse dates
+	startDate, err := time.Parse("2006-01-02", startDateStr)
+	if err != nil {
+		http.Redirect(w, r, "/admin/dashboard?error=Invalid start date format", http.StatusSeeOther)
+		return
+	}
+
+	endDate, err := time.Parse("2006-01-02", endDateStr)
+	if err != nil {
+		http.Redirect(w, r, "/admin/dashboard?error=Invalid end date format", http.StatusSeeOther)
+		return
+	}
+
+	// Validate dates
+	if endDate.Before(startDate) {
+		http.Redirect(w, r, "/admin/dashboard?error=End date cannot be before start date", http.StatusSeeOther)
+		return
+	}
+
+	// Create flash message
+	message := models.FlashMessage{
+		Type:      messageType,
+		Message:   messageText,
+		StartDate: startDate,
+		EndDate:   endDate,
+		Active:    active,
+	}
+
+	_, err = m.DB.CreateFlashMessage(message)
+	if err != nil {
+		http.Redirect(w, r, "/admin/dashboard?error=Failed to create announcement", http.StatusSeeOther)
+		return
+	}
+
+	http.Redirect(w, r, "/admin/dashboard?success=Announcement created successfully", http.StatusSeeOther)
 }
 
 // ShowCreateMenuItem displays the form to create a new menu item

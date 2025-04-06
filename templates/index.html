@@ -32,7 +32,18 @@
       <div class="gradient-background fixed inset-0 -z-10"></div>
       {{ template "header" . }}
       <main>
-         <!-- Announcement Banner -->
+         <!-- Dynamic Flash Messages -->
+         {{ range .FlashMessages }}
+         <section class="py-4 {{ if eq .Type "success" }}bg-green-100{{ else }}bg-red-100{{ end }} mb-4">
+            <div class="container mx-auto px-6 text-center">
+               <p class="text-lg {{ if eq .Type "success" }}text-green-800{{ else }}text-red-800{{ end }} font-medium">
+                  {{ .Message }}
+               </p>
+            </div>
+         </section>
+         {{ end }}
+         
+         <!-- Static Announcement Banner -->
          <section class="py-6 bg-transparent">
             <div class="container mx-auto px-6 text-center">
                <h2 class="text-2xl font-display font-bold text-black">Dienstag Pizza Tag!</h2>
