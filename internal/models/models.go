@@ -253,13 +253,13 @@ func (m *DBModel) GetActiveFlashMessages() ([]FlashMessage, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	now := time.Now()
+	// For testing: Get all active messages regardless of date range
 	query := `SELECT id, type, message, start_date, end_date, active, created_at, updated_at
 		FROM flash_messages
-		WHERE active = 1 AND start_date <= ? AND end_date >= ?
+		WHERE active = 1
 		ORDER BY created_at DESC`
 
-	rows, err := m.DB.QueryContext(ctx, query, now, now)
+	rows, err := m.DB.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
 	}
