@@ -42,36 +42,22 @@
                </p>
             </div>
          </section>
-         
          <!-- HIGHLY VISIBLE ANNOUNCEMENTS -->
          {{ range .FlashMessages }}
          <section class="py-6 flash-message" data-id="{{ .ID }}">
             <div class="container mx-auto px-4">
-               <!-- Announcement with eye-catching design -->
-               <div class="bg-red-500 text-white rounded-lg p-4 shadow-xl border-4 border-yellow-400 relative overflow-hidden animate-pulse">
-                  <!-- Stripe decoration -->
-                  <div class="absolute -right-10 -top-10 w-40 h-40 rotate-45 bg-yellow-400 opacity-20"></div>
-                  
-                  <div class="flex items-center justify-between relative z-10">
-                     <div class="flex items-center">
-                        <!-- Announcement icon -->
-                        <div class="bg-white p-3 rounded-full mr-4 shadow-md">
-                           <i class="fas fa-exclamation-triangle text-red-600 text-2xl"></i>
-                        </div>
-                        
-                        <!-- Message -->
-                        <div>
-                           <h3 class="text-2xl font-bold">ANNOUNCEMENT!</h3>
-                           <p class="text-xl mt-1">{{ .Message }}</p>
-                        </div>
+               <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border-2 border-pizza-red relative">
+                  <div class="p-4">
+                     <!-- Title with inline close button -->
+                     <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xl font-bold text-white">Neuigkeiten</h3>
+                        <!-- Basic button with minimal styling -->
+                        <button type="button" class="flash-close-btn inline-block bg-red-600 text-white rounded-full p-1.5" aria-label="Close">
+                        X
+                        </button>
                      </div>
-                     
-                     <!-- Close button -->
-                     <button class="flash-close-btn bg-white text-red-600 hover:bg-red-100 p-2 rounded-full shadow-md transition duration-200 focus:outline-none" aria-label="Close">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                     </button>
+                     <!-- Message content -->
+                     <p class="text-white">{{ .Message }}</p>
                   </div>
                </div>
             </div>
@@ -304,33 +290,33 @@
       </main>
       {{ template "footer" . }}
       <script>
-       // Flash message close functionality with animation
-       document.addEventListener('DOMContentLoaded', function() {
-         // Stop the pulse animation when page loads to draw attention first, then stop
-         setTimeout(function() {
-           const announcements = document.querySelectorAll('.animate-pulse');
-           announcements.forEach(el => {
-             el.classList.remove('animate-pulse');
-           });
-         }, 2000);
-         
-         // Set up close button functionality
-         const closeButtons = document.querySelectorAll('.flash-close-btn');
-         closeButtons.forEach(button => {
-           button.addEventListener('click', function() {
-             const flashMessage = this.closest('.flash-message');
-             
-             // Add fade-out animation
-             flashMessage.style.transition = 'opacity 0.5s ease';
-             flashMessage.style.opacity = '0';
-             
-             // Remove the element after animation completes
-             setTimeout(() => {
-               flashMessage.remove();
-             }, 500);
+         // Flash message close functionality with animation
+         document.addEventListener('DOMContentLoaded', function() {
+           // Stop the pulse animation when page loads to draw attention first, then stop
+           setTimeout(function() {
+             const announcements = document.querySelectorAll('.animate-pulse');
+             announcements.forEach(el => {
+               el.classList.remove('animate-pulse');
+             });
+           }, 2000);
+           
+           // Set up close button functionality
+           const closeButtons = document.querySelectorAll('.flash-close-btn');
+           closeButtons.forEach(button => {
+             button.addEventListener('click', function() {
+               const flashMessage = this.closest('.flash-message');
+               
+               // Add fade-out animation
+               flashMessage.style.transition = 'opacity 0.5s ease';
+               flashMessage.style.opacity = '0';
+               
+               // Remove the element after animation completes
+               setTimeout(() => {
+                 flashMessage.remove();
+               }, 500);
+             });
            });
          });
-       });
       </script>
    </body>
 </html>
