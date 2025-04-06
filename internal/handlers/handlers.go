@@ -378,6 +378,11 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		// If we've successfully uploaded a new file, delete the old one if it exists
+		if existingItem.ImageURL != "" {
+			m.deleteImageFile(existingItem.ImageURL)
+		}
+
 		// Update the item's image URL
 		item.ImageURL = "/" + filePath // Add leading slash for web path
 	}
@@ -411,6 +416,12 @@ func (m *Repository) DeleteMenuItem(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Invalid item ID", http.StatusBadRequest)
 		return
+	}
+
+	// Get the item before deletion to access its image URL
+	item, err := m.DB.GetMenuItemByID(id)
+	if err == nil && item.ImageURL != "" {
+		m.deleteImageFile(item.ImageURL)
 	}
 
 	err = m.DB.DeleteMenuItem(id)
@@ -451,7 +462,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 		Price:       price,
 		SmallPrice:  smallPrice,
 		Category:    r.FormValue("category"),
-		ImageURL:    r.FormValue("image_url"), // Default to current URL if exists
+		ImageURL:    r.FormValue("image_url"),
 	}
 
 	// Handle file upload if provided
@@ -535,4 +546,31 @@ func (m *Repository) AdminCreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, "/admin/users", http.StatusSeeOther)
+}
+
+// Helper function to safely delete image files
+func (m *Repository) deleteImageFile(imageURL string) {
+	// Skip if empty URL
+	if imageURL == "" {
+		return
+	}
+
+	// Remove the leading slash if present
+	if strings.HasPrefix(imageURL, "/") {
+		imageURL = imageURL[1:]
+	}
+
+	// Make sure the file exists and is within the menu images directory
+	if !strings.Contains(imageURL, "static/images/menu") {
+		return
+	}
+
+	// Attempt to delete the file
+	err := os.Remove(imageURL)
+	if err != nil {
+		// Just log the error but don't throw an exception
+		log.Printf("Error deleting image file %s: %v", imageURL, err)
+	} else {
+		log.Printf("Successfully deleted old image file: %s", imageURL)
+	}
 }
