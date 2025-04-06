@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link href="/static/css/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap">
+    <style>
+        .font-garamond {
+            font-family: 'EB Garamond', serif;
+        }
+        .login-button {
+            background-color: #e53e3e; /* red-600 equivalent */
+            color: white;
+            font-weight: bold;
+            padding: 10px 16px;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            border: none;
+        }
+        .login-button:hover {
+            background-color: #c53030; /* red-700 equivalent */
+        }
+        .input-field {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d2d6dc;
+            border-radius: 6px;
+            max-width: 320px;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
+        }
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="login-container">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 font-garamond">Pizzeria Admin</h1>
+            <p class="text-gray-600">Login to manage your menu</p>
+        </div>
+        
+        {{if .Error}}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+            <p>Invalid username or password</p>
+        </div>
+        {{end}}
+        
+        <form action="/login" method="POST" class="space-y-4">
+            <div class="flex flex-col items-center">
+                <label for="username" class="block text-gray-700 font-semibold mb-2 self-start">Username</label>
+                <input type="text" id="username" name="username" required class="input-field">
+            </div>
+            <div class="flex flex-col items-center">
+                <label for="password" class="block text-gray-700 font-semibold mb-2 self-start">Password</label>
+                <input type="password" id="password" name="password" required class="input-field">
+            </div>
+            <div class="mt-6">
+                <button type="submit" class="login-button">
+                    Login
+                </button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

@@ -32,7 +32,7 @@
       <div class="gradient-background fixed inset-0 -z-10"></div>
       {{ template "header" . }}
       <main>
-         <!-- Announcement Banner -->
+         <!-- Static Announcement Banner -->
          <section class="py-6 bg-transparent">
             <div class="container mx-auto px-6 text-center">
                <h2 class="text-2xl font-display font-bold text-black">Dienstag Pizza Tag!</h2>
@@ -42,6 +42,27 @@
                </p>
             </div>
          </section>
+         <!-- HIGHLY VISIBLE ANNOUNCEMENTS -->
+         {{ range .FlashMessages }}
+         <section class="py-6 flash-message" data-id="{{ .ID }}">
+            <div class="container mx-auto px-4">
+               <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border-2 border-pizza-red relative">
+                  <div class="p-4">
+                     <!-- Title with inline close button -->
+                     <div class="flex items-center justify-between mb-2">
+                        <h3 class="text-xl font-bold text-white">Neuigkeiten</h3>
+                        <!-- Basic button with minimal styling -->
+                        <button type="button" class="flash-close-btn inline-block bg-red-600 text-white rounded-full p-1.5" aria-label="Close">
+                        X
+                        </button>
+                     </div>
+                     <!-- Message content -->
+                     <p class="text-white">{{ .Message }}</p>
+                  </div>
+               </div>
+            </div>
+         </section>
+         {{ end }}
          <div class="spacer-32"></div>
          {{ template "category-nav" . }}
          <!-- Menu Section -->
@@ -268,5 +289,34 @@
          </section>
       </main>
       {{ template "footer" . }}
+      <script>
+         // Flash message close functionality with animation
+         document.addEventListener('DOMContentLoaded', function() {
+           // Stop the pulse animation when page loads to draw attention first, then stop
+           setTimeout(function() {
+             const announcements = document.querySelectorAll('.animate-pulse');
+             announcements.forEach(el => {
+               el.classList.remove('animate-pulse');
+             });
+           }, 2000);
+           
+           // Set up close button functionality
+           const closeButtons = document.querySelectorAll('.flash-close-btn');
+           closeButtons.forEach(button => {
+             button.addEventListener('click', function() {
+               const flashMessage = this.closest('.flash-message');
+               
+               // Add fade-out animation
+               flashMessage.style.transition = 'opacity 0.5s ease';
+               flashMessage.style.opacity = '0';
+               
+               // Remove the element after animation completes
+               setTimeout(() => {
+                 flashMessage.remove();
+               }, 500);
+             });
+           });
+         });
+      </script>
    </body>
 </html>
