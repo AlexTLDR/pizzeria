@@ -101,6 +101,10 @@ func main() {
 			handlers.Repo.ShowLogin(w, r)
 		}
 	})
+	// Debug endpoints
+	http.HandleFunc("/debug/menu-items", handlers.Repo.DebugMenuItems)
+	http.HandleFunc("/debug/db-check", handlers.Repo.CheckDBConnection)
+	http.HandleFunc("/debug/image-test", handlers.Repo.TestImageOperations)
 
 	adminMux := http.NewServeMux()
 	adminMux.HandleFunc("/admin/dashboard", handlers.Repo.AdminDashboard)

@@ -93,8 +93,7 @@
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold text-gray-800">{{.Title}}</h1>
             <div>
-                <a href="/admin/dashboard" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded mr-2" 
-                   style="background-color: #6b7280 !important; color: white !important; padding: 8px 16px; border-radius: 4px; margin-right: 8px; text-decoration: none; display: inline-block;">
+                <a href="/admin/dashboard" class="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded mr-2 no-underline inline-block">
                     <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
                 </a>
             </div>
@@ -118,12 +117,15 @@
                         <select id="category" name="category" required
                                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="" disabled {{ if not .Item.Category }}selected{{ end }}>Select a category</option>
+                            <option value="Antipasti / Vorspeisen" {{ if eq .Item.Category "Antipasti / Vorspeisen" }}selected{{ end }}>Antipasti / Vorspeisen</option>
+                            <option value="Insalate / Salate" {{ if eq .Item.Category "Insalate / Salate" }}selected{{ end }}>Insalate / Salate</option>
                             <option value="Pizza" {{ if eq .Item.Category "Pizza" }}selected{{ end }}>Pizza</option>
-                            <option value="Pasta" {{ if eq .Item.Category "Pasta" }}selected{{ end }}>Pasta</option>
-                            <option value="Antipasti" {{ if eq .Item.Category "Antipasti" }}selected{{ end }}>Antipasti</option>
-                            <option value="Salads" {{ if eq .Item.Category "Salads" }}selected{{ end }}>Salads</option>
-                            <option value="Desserts" {{ if eq .Item.Category "Desserts" }}selected{{ end }}>Desserts</option>
-                            <option value="Drinks" {{ if eq .Item.Category "Drinks" }}selected{{ end }}>Drinks</option>
+                            <option value="Spaghetti" {{ if eq .Item.Category "Spaghetti" }}selected{{ end }}>Spaghetti</option>
+                            <option value="Penne" {{ if eq .Item.Category "Penne" }}selected{{ end }}>Penne</option>
+                            <option value="Rigatoni" {{ if eq .Item.Category "Rigatoni" }}selected{{ end }}>Rigatoni</option>
+                            <option value="Pasta al Forno" {{ if eq .Item.Category "Pasta al Forno" }}selected{{ end }}>Pasta al Forno / Nudelgerichte überbacken</option>
+                            <option value="Pesce Fritto" {{ if eq .Item.Category "Pesce Fritto" }}selected{{ end }}>Pesce Fritto / Fisch fritiert</option>
+                            <option value="Carne / Fleisch" {{ if eq .Item.Category "Carne / Fleisch" }}selected{{ end }}>Carne / Fleisch</option>
                         </select>
                     </div>
                 </div>
@@ -159,11 +161,21 @@
                     
                     {{if .Item.ImageURL}}
                     <div class="flex items-center space-x-4 mb-4">
-                        <img src="{{.Item.ImageURL}}" alt="{{.Item.Name}}" 
+                        <img src="{{.Item.ImageURL}}" alt="{{.Item.Name}}"
                              class="h-24 w-24 object-cover rounded-md border border-gray-300 current-image"
-                             style="height: 96px; width: 96px; object-fit: cover; border-radius: 6px; border: 1px solid #e5e7eb;"
                              onclick="openImageModal('{{.Item.ImageURL}}')">
-                        <div class="text-sm text-gray-500">Current image</div>
+                        <div class="flex flex-col">
+                            <div class="text-sm text-gray-500">Current image</div>
+                            {{if eq .FormType "edit"}}
+                            <div class="mt-2">
+                                <label class="inline-flex items-center text-sm text-red-600">
+                                    <input type="checkbox" name="remove_image" value="yes" class="mr-2 h-4 w-4 text-red-600 focus:ring-red-500">
+                                    Remove this image
+                                </label>
+                                <div class="text-xs text-gray-500 mt-1">Check this box to remove the image without replacing it</div>
+                            </div>
+                            {{end}}
+                        </div>
                     </div>
                     {{end}}
                     
@@ -171,13 +183,12 @@
                         <div class="text-center">
                             <!-- Improved Upload Button -->
                             <label class="custom-file-upload w-full">
-                                <div class="file-upload-btn bg-blue-500 text-white py-4 px-6 rounded-md"
-                                     style="background-color: #3b82f6 !important; color: white !important; padding: 16px 24px; border-radius: 6px;">
+                                <div class="file-upload-btn bg-blue-500 text-white py-4 px-6 rounded-md">
                                     <i class="fas fa-cloud-upload-alt text-3xl mb-2"></i>
                                     <span class="block font-bold">Click to Upload Image</span>
                                     <span class="text-sm opacity-80">JPG, PNG or GIF up to 5MB</span>
                                 </div>
-                                <input type="file" id="image_upload" name="image_upload" accept="image/*" onchange="updateFilename(this)">
+                                <input type="file" id="image_upload" name="image" accept="image/*" onchange="updateFilename(this)">
                             </label>
                             
                             <!-- Filename display -->
@@ -188,13 +199,11 @@
                 
                 <!-- Buttons -->
                 <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
-                    <a href="/admin/dashboard" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded"
-                       style="background-color: #d1d5db !important; color: #1f2937 !important; padding: 8px 16px; border-radius: 4px; text-decoration: none;">
+                    <a href="/admin/dashboard" class="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded no-underline">
                         <i class="fas fa-times mr-1"></i> Cancel
                     </a>
                     
-                    <button type="submit" class="{{ if .Item.ID }}bg-blue-500 hover:bg-blue-600{{ else }}bg-green-500 hover:bg-green-600{{ end }} text-white py-2 px-4 rounded"
-                            style="{{ if .Item.ID }}background-color: #3b82f6 !important;{{ else }}background-color: #22c55e !important;{{ end }} color: white !important; padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                    <button type="submit" class="{{ if .Item.ID }}bg-blue-500 hover:bg-blue-600{{ else }}bg-green-500 hover:bg-green-600{{ end }} text-white py-2 px-4 rounded cursor-pointer">
                         <i class="fas fa-save mr-1"></i> {{ if .Item.ID }}Update Menu Item{{ else }}Create Menu Item{{ end }}
                     </button>
                 </div>
