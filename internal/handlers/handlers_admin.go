@@ -43,20 +43,11 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	}
 	flashCount := len(flashMessages)
 
-	// Get users
-	users, err := m.DB.GetAllUsers()
-	if err != nil {
-		http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	userCount := len(users)
-
 	// Render the dashboard template
 	err = m.TemplateCache["admin-dashboard.html"].Execute(w, map[string]interface{}{
 		"Title":         "Admin Dashboard",
 		"MenuItemCount": menuItemCount,
 		"FlashMsgCount": flashCount,
-		"UserCount":     userCount,
 		"FlashMessages": flashMessages,
 		"Menu":          menuItems, // Add menu items to the template context
 		"Year":          time.Now().Year(),
@@ -101,8 +92,8 @@ func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) 
 	// Create flash message
 	flashMsg := models.FlashMessage{
 		Message:   message,
-		Type:      "info", // Default type
-		Active:    true,   // Active by default
+		Type:      "info",
+		Active:    true,
 		StartDate: startDate,
 		EndDate:   endDate,
 	}
@@ -159,5 +150,10 @@ func (m *Repository) DeleteFlashMessage(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Redirect back to admin dashboard
+	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
+}
+
+// AdminRoot redirects from /admin to /admin/dashboard
+func (m *Repository) AdminRoot(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 }

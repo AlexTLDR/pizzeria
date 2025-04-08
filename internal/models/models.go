@@ -18,13 +18,15 @@ type MenuItem struct {
 	UpdatedAt   time.Time
 }
 
+// User struct - kept for database migration compatibility
+// This is being deprecated as we move to Google OAuth authentication
 type User struct {
 	ID           int
 	Username     string
 	PasswordHash string
-	//IsAdmin      bool
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	Email        string // Added for OAuth authentication
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
 
 type FlashMessage struct {
@@ -48,7 +50,7 @@ func (m *DBModel) GetAllMenuItems() ([]MenuItem, error) {
 	defer cancel()
 
 	query := `SELECT id, name, description, price, small_price, category, image_url, 
-             created_at, updated_at FROM menu_items ORDER BY category, name`
+              created_at, updated_at FROM menu_items ORDER BY category, name`
 
 	rows, err := m.DB.QueryContext(ctx, query)
 	if err != nil {
@@ -85,7 +87,7 @@ func (m *DBModel) GetMenuItemByID(id int) (MenuItem, error) {
 	defer cancel()
 
 	query := `SELECT id, name, description, price, small_price, category, image_url, 
-             created_at, updated_at FROM menu_items WHERE id = ?`
+              created_at, updated_at FROM menu_items WHERE id = ?`
 
 	var item MenuItem
 	row := m.DB.QueryRowContext(ctx, query, id)
@@ -114,8 +116,8 @@ func (m *DBModel) InsertMenuItem(item MenuItem) (int, error) {
 	defer cancel()
 
 	stmt := `INSERT INTO menu_items (name, description, price, small_price, category, image_url, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            RETURNING id`
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+             RETURNING id`
 
 	var newID int
 	err := m.DB.QueryRowContext(ctx, stmt,
@@ -141,14 +143,14 @@ func (m *DBModel) UpdateMenuItem(item MenuItem) error {
 	defer cancel()
 
 	stmt := `UPDATE menu_items SET
-            name = ?,
-            description = ?,
-            price = ?,
-            small_price = ?,
-            category = ?,
-            image_url = ?,
-            updated_at = ?
-            WHERE id = ?`
+             name = ?,
+             description = ?,
+             price = ?,
+             small_price = ?,
+             category = ?,
+             image_url = ?,
+             updated_at = ?
+             WHERE id = ?`
 
 	_, err := m.DB.ExecContext(ctx, stmt,
 		item.Name,
@@ -173,13 +175,15 @@ func (m *DBModel) DeleteMenuItem(id int) error {
 	return err
 }
 
-// User Methods
+// DEPRECATED: User Methods - No longer used with Google OAuth authentication
+// These methods are kept for reference but are no longer used in the application
+/*
 func (m *DBModel) GetUserByUsername(username string) (User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, username, password_hash, created_at, updated_at 
-             FROM users WHERE username = ?`
+	query := `SELECT id, username, password_hash, email, created_at, updated_at
+               FROM users WHERE username = ?`
 
 	var user User
 	row := m.DB.QueryRowContext(ctx, query, username)
@@ -188,6 +192,7 @@ func (m *DBModel) GetUserByUsername(username string) (User, error) {
 		&user.ID,
 		&user.Username,
 		&user.PasswordHash,
+		&user.Email,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -195,7 +200,6 @@ func (m *DBModel) GetUserByUsername(username string) (User, error) {
 	if err != nil {
 		return user, err
 	}
-
 	return user, nil
 }
 
@@ -203,14 +207,15 @@ func (m *DBModel) InsertUser(user User) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	stmt := `INSERT INTO users (username, password_hash, created_at, updated_at)
-            VALUES (?, ?, ?, ?)
+	stmt := `INSERT INTO users (username, password_hash, email, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?)
             RETURNING id`
 
 	var newID int
 	err := m.DB.QueryRowContext(ctx, stmt,
 		user.Username,
 		user.PasswordHash,
+		user.Email,
 		time.Now(),
 		time.Now(),
 	).Scan(&newID)
@@ -220,13 +225,16 @@ func (m *DBModel) InsertUser(user User) (int, error) {
 	}
 	return newID, nil
 }
+*/
 
+// Commented out user methods that are no longer used
+/*
 // Get all users
 func (m *DBModel) GetAllUsers() ([]User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, username, password_hash, created_at, updated_at
+	query := `SELECT id, username, password_hash, email, created_at, updated_at
               FROM users ORDER BY username`
 
 	rows, err := m.DB.QueryContext(ctx, query)
@@ -243,6 +251,7 @@ func (m *DBModel) GetAllUsers() ([]User, error) {
 			&user.ID,
 			&user.Username,
 			&user.PasswordHash,
+			&user.Email,
 			&user.CreatedAt,
 			&user.UpdatedAt,
 		)
@@ -260,7 +269,7 @@ func (m *DBModel) GetUserByID(id int) (User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, username, password_hash, created_at, updated_at
+	query := `SELECT id, username, password_hash, email, created_at, updated_at
               FROM users WHERE id = ?`
 
 	var user User
@@ -270,6 +279,7 @@ func (m *DBModel) GetUserByID(id int) (User, error) {
 		&user.ID,
 		&user.Username,
 		&user.PasswordHash,
+		&user.Email,
 		&user.CreatedAt,
 		&user.UpdatedAt,
 	)
@@ -289,12 +299,14 @@ func (m *DBModel) UpdateUser(user User) error {
 	stmt := `UPDATE users SET
              username = ?,
              password_hash = ?,
+             email = ?,
              updated_at = ?
              WHERE id = ?`
 
 	_, err := m.DB.ExecContext(ctx, stmt,
 		user.Username,
 		user.PasswordHash,
+		user.Email,
 		time.Now(),
 		user.ID,
 	)
@@ -323,8 +335,9 @@ func (m *DBModel) GetUserCount() (int, error) {
 
 	return count, err
 }
+*/
 
-// FlashMessage Methods
+// FlashMessage Methods - These are still used and active
 func (m *DBModel) CreateFlashMessage(message FlashMessage) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()

@@ -3,14 +3,18 @@ module github.com/AlexTLDR/pizzeria
 go 1.24.1
 
 require (
+	github.com/joho/godotenv v1.5.1
 	github.com/mattn/go-sqlite3 v1.14.27
 	github.com/pressly/goose/v3 v3.24.2
-	golang.org/x/crypto v0.36.0
+	golang.org/x/oauth2 v0.29.0
 )
 
 require (
+	cloud.google.com/go/compute/metadata v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/mfridman/interpolate v0.0.2 // indirect
 	github.com/sethvargo/go-retry v0.3.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
+	golang.org/x/sync v0.13.0 // indirect
+	golang.org/x/sys v0.32.0 // indirect
 )
