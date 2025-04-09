@@ -14,3 +14,6 @@
 
 # Ignore Tailwind output
 static/css/output.css
+
+# Ignore air tmp folder
+/tmp

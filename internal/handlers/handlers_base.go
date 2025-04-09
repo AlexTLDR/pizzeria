@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 	"time"
@@ -11,36 +10,13 @@ import (
 
 // Home handles the home page
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	// Direct SQL query as a fallback/temporary solution
-	log.Println("Querying menu items directly from DB in Home handler")
-	rows, err := m.DB.DB.Query("SELECT id, name, description, category, price, small_price, image_url FROM menu_items")
+	// Use the model's method to get menu items - this properly handles NULL small_price values
+	log.Println("Fetching menu items using model's GetAllMenuItems method")
+	menuItems, err := m.DB.GetAllMenuItems()
 	if err != nil {
-		log.Printf("ERROR querying menu items: %v", err)
+		log.Printf("ERROR fetching menu items: %v", err)
 		http.Error(w, "Error fetching menu items: "+err.Error(), http.StatusInternalServerError)
 		return
-	}
-	defer rows.Close()
-
-	var menuItems []models.MenuItem
-	for rows.Next() {
-		var item models.MenuItem
-		var smallPrice sql.NullFloat64
-
-		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Category, &item.Price, &smallPrice, &item.ImageURL)
-		if err != nil {
-			log.Printf("ERROR scanning menu item: %v", err)
-			continue
-		}
-
-		// Handle NULL values properly
-		if smallPrice.Valid {
-			value := smallPrice.Float64
-			item.SmallPrice = &value
-		} else {
-			item.SmallPrice = nil
-		}
-
-		menuItems = append(menuItems, item)
 	}
 	log.Printf("Retrieved %d menu items directly via SQL", len(menuItems))
 
