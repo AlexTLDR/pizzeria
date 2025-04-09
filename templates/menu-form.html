@@ -197,6 +197,14 @@
                                 <input type="text" id="image_url" name="image_url" value="{{ .Item.ImageURL }}" readonly
                                     class="w-full px-4 py-2 border bg-gray-100 rounded-lg">
                             </div>
+                            
+                            <!-- Only show remove option if there's an existing image -->
+                            {{ if .Item.ImageURL }}
+                            <div class="mt-4 flex items-center">
+                                <input type="checkbox" id="remove_image" name="remove_image" value="yes" class="mr-2 h-4 w-4 text-red-600">
+                                <label for="remove_image" class="text-red-600 font-semibold">Remove current image without replacing</label>
+                            </div>
+                            {{ end }}
                         </div>
                         
                         <!-- Current Image Preview (if exists) -->

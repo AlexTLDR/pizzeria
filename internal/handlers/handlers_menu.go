@@ -28,16 +28,26 @@ func (m *Repository) deleteImageFile(imageURL string) {
 
 	// Make sure the file exists and is within the menu images directory
 	if !strings.Contains(imageURL, "static/images/menu") {
+		log.Printf("Warning: Attempted to delete image outside of menu directory: %s", imageURL)
+		return
+	}
+
+	// Get the absolute file path
+	filePath := imageURL // The path should now be relative without leading slash
+
+	// Verify the file exists before attempting to delete
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		log.Printf("Warning: Image file does not exist: %s", filePath)
 		return
 	}
 
 	// Attempt to delete the file
-	err := os.Remove(imageURL)
+	err := os.Remove(filePath)
 	if err != nil {
 		// Just log the error but don't throw an exception
-		log.Printf("Error deleting image file %s: %v", imageURL, err)
+		log.Printf("Error deleting image file %s: %v", filePath, err)
 	} else {
-		log.Printf("Successfully deleted old image file: %s", imageURL)
+		log.Printf("Successfully deleted old image file: %s", filePath)
 	}
 }
 
@@ -109,7 +119,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 
 	// Handle the uploaded image
 	var imageURL string
-	file, header, err := r.FormFile("image")
+	file, header, err := r.FormFile("image_upload")
 	if err == nil {
 		defer file.Close()
 
@@ -271,7 +281,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 		// Check if a new image was uploaded
 		var file multipart.File
 		var header *multipart.FileHeader
-		file, header, err = r.FormFile("image")
+		file, header, err = r.FormFile("image_upload")
 
 		// Only process if a new image was uploaded
 		if err == nil {
