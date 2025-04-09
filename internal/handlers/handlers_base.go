@@ -12,7 +12,7 @@ import (
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	// Direct SQL query as a fallback/temporary solution
 	log.Println("Querying menu items directly from DB in Home handler")
-	rows, err := m.DB.DB.Query("SELECT id, name, description, category, price, image_url FROM menu_items")
+	rows, err := m.DB.DB.Query("SELECT id, name, description, category, price, small_price, image_url FROM menu_items")
 	if err != nil {
 		log.Printf("ERROR querying menu items: %v", err)
 		http.Error(w, "Error fetching menu items: "+err.Error(), http.StatusInternalServerError)
@@ -23,7 +23,7 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	var menuItems []models.MenuItem
 	for rows.Next() {
 		var item models.MenuItem
-		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Category, &item.Price, &item.ImageURL)
+		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Category, &item.Price, &item.SmallPrice, &item.ImageURL)
 		if err != nil {
 			log.Printf("ERROR scanning menu item: %v", err)
 			continue
