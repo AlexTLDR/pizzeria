@@ -180,9 +180,17 @@
                                 {{.StartDate.Format "Jan 02, 2006"}} - {{.EndDate.Format "Jan 02, 2006"}}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                {{if .Active}}
+                                {{if eq .Status "Active"}}
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                                     Active
+                                </span>
+                                {{else if eq .Status "Expired"}}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
+                                    Expired
+                                </span>
+                                {{else if eq .Status "Scheduled"}}
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                    Scheduled
                                 </span>
                                 {{else}}
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
