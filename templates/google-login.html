@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link href="/static/css/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap">
+    <style>
+        .font-garamond {
+            font-family: 'EB Garamond', serif;
+        }
+        .login-button {
+            background-color: #4285F4; /* Google blue */
+            color: white;
+            font-weight: bold;
+            padding: 10px 16px;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .login-button:hover {
+            background-color: #3367D6; /* Darker Google blue */
+        }
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .google-icon {
+            width: 24px;
+            height: 24px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="login-container">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 font-garamond">Pizzeria Admin</h1>
+            <p class="text-gray-600">Sign in with your Gmail account</p>
+        </div>
+        
+        {{if .Error}}
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
+            <p>{{.Error}}</p>
+        </div>
+        {{end}}
+        
+        <div class="mt-6">
+            <a href="{{.LoginURL}}" class="login-button">
+                <svg class="google-icon" viewBox="0 0 24 24">
+                    <path fill="#FFFFFF" d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12C5,7.9 8.2,4.73 12.2,4.73C15.29,4.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2 12.1,2C6.42,2 2.03,6.8 2.03,12C2.03,17.05 6.16,22 12.25,22C17.6,22 21.5,18.33 21.5,12.91C21.5,11.76 21.35,11.1 21.35,11.1V11.1Z"/>
+                </svg>
+                Sign in with Google
+            </a>
+        </div>
+    </div>
+</body>
+</html>

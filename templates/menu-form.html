@@ -13,11 +13,11 @@
             font-family: 'EB Garamond', serif;
         }
         .save-button {
-            background-color: #dc2626;
+            background-color: #2563eb; /* Changed to blue */
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.125rem; /* Smaller font size */
             font-weight: bold;
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem; /* Smaller padding */
             border-radius: 0.5rem;
             border: none;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -28,9 +28,58 @@
             justify-content: center;
         }
         .save-button:hover {
-            background-color: #b91c1c;
+            background-color: #1d4ed8; /* Darker blue on hover */
             transform: translateY(-2px);
             box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        .cancel-button {
+            background-color: #ef4444; /* Kept red */
+            color: white;
+            font-size: 1.125rem; /* Smaller font size */
+            font-weight: bold;
+            padding: 0.75rem 1.5rem; /* Smaller padding */
+            border-radius: 0.5rem;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .cancel-button:hover {
+            background-color: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+        .upload-section {
+            border: 2px solid #d1fae5;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            background-color: #f0fdf4;
+            transition: all 0.3s ease;
+        }
+        .upload-section:hover {
+            border-color: #34d399;
+            box-shadow: 0 2px 8px rgba(52, 211, 153, 0.2);
+        }
+        .image-preview {
+            margin-top: 1rem;
+            display: none;
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border: 2px solid #34d399;
+        }
+        .preview-container {
+            margin-top: 1rem;
+            display: none;
+        }
+        .preview-title {
+            font-weight: 600;
+            color: #059669;
+            margin-bottom: 0.5rem;
         }
     </style>
 </head>
@@ -118,24 +167,29 @@
                         
                         <div>
                             <label for="small_price" class="block text-gray-700 font-semibold mb-2">Small Price (€) <span class="text-gray-500 text-sm">(Optional, for Pizza)</span></label>
-                            <input type="number" id="small_price" name="small_price" step="0.01" min="0" 
+                            <input type="number" id="small_price" name="small_price" step="0.01" min="0"
                                 value="{{ if .Item.SmallPrice }}{{ printf "%.2f" (deref .Item.SmallPrice) }}{{ end }}"
                                 class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
                         </div>
                         
-                        <div class="border-2 border-green-200 rounded-lg p-4 bg-green-50">
+                        <div class="upload-section">
                             <div class="flex items-center mb-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
+                                <i class="fas fa-image text-green-600 mr-2"></i>
                                 <h3 class="text-lg font-semibold text-green-800">Image Upload</h3>
                             </div>
                             
                             <div>
                                 <label for="image_upload" class="block text-gray-700 font-semibold mb-2">Select New Image</label>
                                 <input type="file" id="image_upload" name="image_upload" accept="image/*"
-                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                                    class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                                    onchange="previewImage(this)">
                                 <p class="text-sm text-gray-600 mt-1">Upload an image file (JPEG, PNG or GIF recommended)</p>
+                            </div>
+                            
+                            <!-- New Image Preview -->
+                            <div id="preview-container" class="preview-container">
+                                <p class="preview-title">New Image Preview:</p>
+                                <img id="image-preview" class="image-preview">
                             </div>
                             
                             <div class="mt-4">
@@ -144,9 +198,16 @@
                                     class="w-full px-4 py-2 border bg-gray-100 rounded-lg">
                             </div>
                             
+                            <!-- Only show remove option if there's an existing image -->
+                            {{ if .Item.ImageURL }}
+                            <div class="mt-4 flex items-center">
+                                <input type="checkbox" id="remove_image" name="remove_image" value="yes" class="mr-2 h-4 w-4 text-red-600">
+                                <label for="remove_image" class="text-red-600 font-semibold">Remove current image without replacing</label>
+                            </div>
+                            {{ end }}
                         </div>
                         
-                        <!-- Image Preview (if exists) -->
+                        <!-- Current Image Preview (if exists) -->
                         {{ if .Item.ImageURL }}
                         <div class="mt-4">
                             <p class="text-gray-700 font-semibold mb-2">Current Image</p>
@@ -156,19 +217,19 @@
                     </div>
                 </div>
                 
-                <!-- Clear, large save button section -->
+                <!-- Button section with blue info message -->
                 <div class="mt-8 bg-gray-100 p-6 rounded-lg border-2 border-gray-300">
                     <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                        <div class="flex items-center text-lg text-gray-700">
+                        <div class="flex items-center text-lg text-blue-700">
                             <i class="fas fa-info-circle text-2xl mr-3 text-blue-600"></i>
-                            <span>Please click the RED button to save your changes</span>
+                            <span>Complete the form and save your changes</span>
                         </div>
                         <div class="flex gap-4">
-                            <a href="/admin/dashboard" class="px-5 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition flex items-center">
-                                <i class="fas fa-arrow-left mr-2"></i> Cancel
+                            <a href="/admin/dashboard" class="cancel-button">
+                                <i class="fas fa-times mr-2"></i> CANCEL
                             </a>
                             <button type="submit" class="save-button">
-                                <i class="fas fa-save mr-3"></i> SAVE CHANGES
+                                <i class="fas fa-save mr-2"></i> SAVE
                             </button>
                         </div>
                     </div>
@@ -182,5 +243,28 @@
             <p>&copy; {{ .Year }} Pizzeria Admin. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        // Function to preview the selected image before upload
+        function previewImage(input) {
+            const preview = document.getElementById('image-preview');
+            const previewContainer = document.getElementById('preview-container');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    previewContainer.style.display = 'block';
+                    preview.style.display = 'block';
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = '';
+                previewContainer.style.display = 'none';
+            }
+        }
+    </script>
 </body>
 </html>

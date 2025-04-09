@@ -3,77 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>{{ .Title }}</title>
     <link href="/static/css/output.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600;700&display=swap">
     <style>
-        .font-garamond {
-            font-family: 'EB Garamond', serif;
-        }
-        .login-button {
-            background-color: #e53e3e; /* red-600 equivalent */
-            color: white;
-            font-weight: bold;
-            padding: 10px 16px;
-            border-radius: 8px;
-            width: 100%;
-            cursor: pointer;
-            border: none;
-        }
-        .login-button:hover {
-            background-color: #c53030; /* red-700 equivalent */
-        }
-        .input-field {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #d2d6dc;
-            border-radius: 6px;
-            max-width: 320px;
-        }
-        .input-field:focus {
-            outline: none;
-            border-color: #e53e3e;
-            box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.2);
-        }
         .login-container {
-            background-color: white;
-            padding: 2rem;
+            max-width: 500px;
+            margin: 100px auto;
+            padding: 40px;
             border-radius: 10px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 400px;
-            margin: 0 auto;
+            background-color: white;
+        }
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            background-color: #fff;
+            color: #757575;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        .google-btn:hover {
+            background-color: #f5f5f5;
+        }
+        .google-icon {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+        .error-message {
+            color: #d32f2f;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+            text-align: center;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<body class="bg-gray-100">
     <div class="login-container">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-800 font-garamond">Pizzeria Admin</h1>
-            <p class="text-gray-600">Login to manage your menu</p>
+        <div class="text-center mb-10">
+            <img src="/static/images/la-piccola-sardegna-titel.png" alt="La Piccola Sardegna" class="mx-auto h-32">
+            <h1 class="text-2xl font-bold mt-4">Admin Login</h1>
+            <p class="text-gray-600 mt-2">Sign in with your authorized Gmail account to access the admin dashboard</p>
         </div>
-        
+
         {{if .Error}}
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4" role="alert">
-            <p>Invalid username or password</p>
+        <div class="error-message">
+            {{.Error}}
         </div>
         {{end}}
-        
-        <form action="/login" method="POST" class="space-y-4">
-            <div class="flex flex-col items-center">
-                <label for="username" class="block text-gray-700 font-semibold mb-2 self-start">Username</label>
-                <input type="text" id="username" name="username" required class="input-field">
-            </div>
-            <div class="flex flex-col items-center">
-                <label for="password" class="block text-gray-700 font-semibold mb-2 self-start">Password</label>
-                <input type="password" id="password" name="password" required class="input-field">
-            </div>
-            <div class="mt-6">
-                <button type="submit" class="login-button">
-                    Login
-                </button>
-            </div>
-        </form>
+
+        <a href="/auth/google/login" class="google-btn">
+            <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            Sign in with Google
+        </a>
+    </div>
+
+    <div class="text-center text-gray-500 text-sm mt-4">
+        &copy; {{ .Year }} La Piccola Sardegna. All rights reserved.
     </div>
 </body>
 </html>
