@@ -57,7 +57,13 @@ func (m *Repository) ShowCreateMenuItem(w http.ResponseWriter, r *http.Request) 
 
 // CreateMenuItem handles the create menu item form submission
 func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
-	// Parse the form data
+	// Check if this is a GET request - if so, show the form instead of processing it
+	if r.Method == "GET" {
+		m.ShowCreateMenuItem(w, r)
+		return
+	}
+
+	// For POST requests, parse the form data
 	err := r.ParseMultipartForm(10 << 20) // 10 MB max
 	if err != nil {
 		http.Error(w, "Could not parse form", http.StatusBadRequest)
@@ -69,6 +75,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 	description := r.FormValue("description")
 	categoryRaw := r.FormValue("category")
 	priceStr := r.FormValue("price")
+	smallPriceStr := r.FormValue("small_price")
 
 	// Basic validation
 	if name == "" || description == "" || categoryRaw == "" || priceStr == "" {
@@ -87,6 +94,17 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Invalid price", http.StatusBadRequest)
 		return
+	}
+
+	// Parse small price if provided
+	var smallPrice *float64
+	if smallPriceStr != "" {
+		smallPriceValue, err := strconv.ParseFloat(smallPriceStr, 64)
+		if err != nil {
+			http.Error(w, "Invalid small price", http.StatusBadRequest)
+			return
+		}
+		smallPrice = &smallPriceValue
 	}
 
 	// Handle the uploaded image
@@ -128,6 +146,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 		Description: description,
 		Category:    category,
 		Price:       price,
+		SmallPrice:  smallPrice,
 		ImageURL:    imageURL,
 	}
 
@@ -182,12 +201,19 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if this is a GET request - if so, redirect to the edit form
+	if r.Method == "GET" {
+		http.Redirect(w, r, "/admin/menu/edit/"+id, http.StatusSeeOther)
+		return
+	}
+
 	// Get existing item to check for image changes
 	existingItem, err := m.DB.GetMenuItemByID(idInt)
 	if err != nil {
 		http.Error(w, "Menu item not found", http.StatusNotFound)
 		return
 	}
+
 	// Parse the form data
 	err = r.ParseMultipartForm(10 << 20) // 10 MB max
 	if err != nil {
@@ -200,7 +226,8 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	description := r.FormValue("description")
 	categoryRaw := r.FormValue("category")
 	priceStr := r.FormValue("price")
-	removeImage := r.FormValue("remove_image") // New field to check if image should be removed
+	smallPriceStr := r.FormValue("small_price")
+	removeImage := r.FormValue("remove_image")
 
 	// Basic validation
 	if name == "" || description == "" || categoryRaw == "" || priceStr == "" {
@@ -219,6 +246,17 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Invalid price", http.StatusBadRequest)
 		return
+	}
+
+	// Parse small price if provided
+	var smallPrice *float64
+	if smallPriceStr != "" {
+		smallPriceValue, err := strconv.ParseFloat(smallPriceStr, 64)
+		if err != nil {
+			http.Error(w, "Invalid small price", http.StatusBadRequest)
+			return
+		}
+		smallPrice = &smallPriceValue
 	}
 
 	// Handle the uploaded image
@@ -279,6 +317,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 		Description: description,
 		Category:    category,
 		Price:       price,
+		SmallPrice:  smallPrice,
 		ImageURL:    imageURL,
 	}
 
