@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"time"
@@ -23,11 +24,22 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	var menuItems []models.MenuItem
 	for rows.Next() {
 		var item models.MenuItem
-		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Category, &item.Price, &item.SmallPrice, &item.ImageURL)
+		var smallPrice sql.NullFloat64
+
+		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Category, &item.Price, &smallPrice, &item.ImageURL)
 		if err != nil {
 			log.Printf("ERROR scanning menu item: %v", err)
 			continue
 		}
+
+		// Handle NULL values properly
+		if smallPrice.Valid {
+			value := smallPrice.Float64
+			item.SmallPrice = &value
+		} else {
+			item.SmallPrice = nil
+		}
+
 		menuItems = append(menuItems, item)
 	}
 	log.Printf("Retrieved %d menu items directly via SQL", len(menuItems))
@@ -60,7 +72,7 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 		"Title":          "La Piccola Sardegna",
 		"Categories":     categories,
 		"MenuByCategory": menuByCategory,
-		"Menu":           menuItems, // Add menuItems under the "Menu" key for the template
+		"Menu":           menuItems,
 		"FlashMessages":  flashMessages,
 		"Year":           time.Now().Year(),
 	})
