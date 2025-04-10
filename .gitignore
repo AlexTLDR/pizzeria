@@ -7,7 +7,7 @@
 
 # Ignore database files and menu pictures 
 *.db
-/static/images/menu
+#/static/images/menu
 # Ignore Go build files
 /bin
 /pkg
