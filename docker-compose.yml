@@ -9,3 +9,4 @@ services:
     restart: unless-stopped
     volumes:
       - ./db:/app/db
+      - ./static/images/menu:/app/static/images/menu
