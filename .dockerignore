@@ -1,0 +1,21 @@
+# Ignore version control
+.git
+.gitignore
+
+# Ignore Docker files themselves
+Dockerfile
+docker-compose.yml
+
+# Ignore documentation
+*.md
+
+# Ignore logs
+*.log
+
+# Ignore node modules (if any frontend assets)
+node_modules
+
+# Ignore build artifacts
+dist
+build
+tmp

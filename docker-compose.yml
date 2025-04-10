@@ -1,0 +1,9 @@
+services:
+  pizzeria:
+    build: .
+    container_name: pizzeria
+    ports:
+      - "2020:8080"
+    env_file:
+      - .env
+    restart: unless-stopped
