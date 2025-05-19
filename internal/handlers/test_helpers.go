@@ -14,23 +14,57 @@ import (
 	"github.com/AlexTLDR/pizzeria/internal/models"
 )
 
-// NewTestRepo creates a repository struct for testing
-func NewTestRepo(t *testing.T) *Repository {
-	// Load templates for testing
-	templateCache := make(map[string]*template.Template)
+func createMockTemplates() map[string]*template.Template {
+	funcMap := template.FuncMap{
+		"deref": func(f *float64) float64 {
+			if f != nil {
+				return *f
+			}
+			return 0
+		},
+	}
 	
-	// Create temp database for testing
+	indexTemplate := template.New("index.html").Funcs(funcMap)
+	indexTemplate, _ = indexTemplate.Parse(`<!DOCTYPE html>
+<html>
+<head><title>Mock Index Template</title></head>
+<body>
+  <h1>Mock Template for Testing</h1>
+  <div>This is mock content for testing the Home handler</div>
+</body>
+</html>`)
+	
+	adminTemplate := template.New("admin-dashboard.html").Funcs(funcMap)
+	adminTemplate, _ = adminTemplate.Parse(`<html><body>Mock Admin Dashboard</body></html>`)
+	
+	loginTemplate := template.New("login.html").Funcs(funcMap)
+	loginTemplate, _ = loginTemplate.Parse(`<html><body>Mock Login Page</body></html>`)
+	
+	menuFormTemplate := template.New("menu-form.html").Funcs(funcMap)
+	menuFormTemplate, _ = menuFormTemplate.Parse(`<html><body>Mock Menu Form</body></html>`)
+	
+	templateCache := map[string]*template.Template{
+		"index.html":           indexTemplate,
+		"admin-dashboard.html": adminTemplate,
+		"login.html":           loginTemplate,
+		"menu-form.html":       menuFormTemplate,
+	}
+	
+	return templateCache
+}
+
+func NewTestRepo(t *testing.T) *Repository {
+	templateCache := createMockTemplates()
+	
 	db, err := createTestDB()
 	if err != nil {
 		t.Fatalf("failed to create test DB: %v", err)
 	}
 
-	// Create sample DB model
 	testDBModel := &models.DBModel{
 		DB: db,
 	}
 
-	// Create test OAuth config
 	testOAuthConfig := &auth.OAuthConfig{
 		AllowedEmails: []string{"test@example.com", "admin@example.com"},
 	}
@@ -42,24 +76,19 @@ func NewTestRepo(t *testing.T) *Repository {
 	}
 }
 
-// createTestDB creates a temporary SQLite database for testing
 func createTestDB() (*sql.DB, error) {
-	// Create a temp directory
 	tempDir, err := os.MkdirTemp("", "pizzeria-test-*")
 	if err != nil {
 		return nil, err
 	}
 
-	// Create a temp database file
 	dbPath := filepath.Join(tempDir, "test.db")
 	
-	// Open the database connection
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return nil, err
 	}
 
-	// Create test schema
 	_, err = db.Exec(`
 		CREATE TABLE menu_items (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -93,7 +122,6 @@ func createTestDB() (*sql.DB, error) {
 	return db, nil
 }
 
-// CreateTestRequest creates a test request with optional body
 func CreateTestRequest(t *testing.T, method, url string, body io.Reader) (*http.Request, *httptest.ResponseRecorder) {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
@@ -108,17 +136,13 @@ func CreateTestRequest(t *testing.T, method, url string, body io.Reader) (*http.
 	return req, rr
 }
 
-// CleanTestDB closes the database and cleans up any temporary files
 func CleanTestDB(repo *Repository) {
 	if repo != nil && repo.DB != nil && repo.DB.DB != nil {
-		// Get the database file path from the connection
 		var dbPath string
 		err := repo.DB.DB.QueryRow("PRAGMA database_list").Scan(nil, &dbPath, nil)
 		if err == nil && dbPath != "" {
-			// Close the database connection
 			repo.DB.DB.Close()
 			
-			// Remove the directory containing the database file
 			if filepath.Dir(dbPath) != "." {
 				os.RemoveAll(filepath.Dir(dbPath))
 			}

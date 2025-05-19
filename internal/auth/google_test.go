@@ -14,19 +14,19 @@ func TestOAuthConfig_IsAllowedEmail(t *testing.T) {
 		want          bool
 	}{
 		{
-			name:          "Email in allowed list returns true",
+			name:          "Email in allowed list",
 			allowedEmails: []string{"test@example.com", "admin@example.com", "owner@example.com"},
 			email:         "admin@example.com",
 			want:          true,
 		},
 		{
-			name:          "Email not in allowed list returns false",
+			name:          "Email not in allowed list",
 			allowedEmails: []string{"test@example.com", "admin@example.com", "owner@example.com"},
 			email:         "unauthorized@example.com",
 			want:          false,
 		},
 		{
-			name:          "Empty email returns false",
+			name:          "Empty email",
 			allowedEmails: []string{"test@example.com", "admin@example.com"},
 			email:         "",
 			want:          false,
@@ -38,7 +38,7 @@ func TestOAuthConfig_IsAllowedEmail(t *testing.T) {
 			want:          false,
 		},
 		{
-			name:          "Single allowed email works",
+			name:          "Single allowed email",
 			allowedEmails: []string{"single@example.com"},
 			email:         "single@example.com",
 			want:          true,
@@ -47,7 +47,7 @@ func TestOAuthConfig_IsAllowedEmail(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create a test OAuthConfig
+
 			c := &OAuthConfig{
 				GoogleOAuthConfig: &oauth2.Config{},
 				AllowedEmails:     tt.allowedEmails,

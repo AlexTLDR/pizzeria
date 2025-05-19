@@ -18,7 +18,7 @@ func TestFlashMessage_GetStatus(t *testing.T) {
 		wantStatus  string
 	}{
 		{
-			name: "Inactive message should return Inactive",
+			name: "Inactive message",
 			flashMsg: FlashMessage{
 				Active:    false,
 				StartDate: yesterday,
@@ -27,7 +27,7 @@ func TestFlashMessage_GetStatus(t *testing.T) {
 			wantStatus: "Inactive",
 		},
 		{
-			name: "Current message should return Active",
+			name: "Current message",
 			flashMsg: FlashMessage{
 				Active:    true,
 				StartDate: yesterday,
@@ -36,7 +36,7 @@ func TestFlashMessage_GetStatus(t *testing.T) {
 			wantStatus: "Active",
 		},
 		{
-			name: "Future message should return Scheduled",
+			name: "Future message",
 			flashMsg: FlashMessage{
 				Active:    true,
 				StartDate: tomorrow,
@@ -45,7 +45,7 @@ func TestFlashMessage_GetStatus(t *testing.T) {
 			wantStatus: "Scheduled",
 		},
 		{
-			name: "Past message should return Expired",
+			name: "Past message",
 			flashMsg: FlashMessage{
 				Active:    true,
 				StartDate: lastWeek,
@@ -54,7 +54,7 @@ func TestFlashMessage_GetStatus(t *testing.T) {
 			wantStatus: "Expired",
 		},
 		{
-			name: "Today is start date should return Active",
+			name: "Today is start date",
 			flashMsg: FlashMessage{
 				Active:    true,
 				StartDate: time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()),
@@ -63,7 +63,7 @@ func TestFlashMessage_GetStatus(t *testing.T) {
 			wantStatus: "Active",
 		},
 		{
-			name: "Today is end date should return Active",
+			name: "Today is end date",
 			flashMsg: FlashMessage{
 				Active:    true,
 				StartDate: yesterday,
