@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "go test ./...",
+    "test:verbose": "go test -v ./...",
+    "test:race": "go test -race ./...",
+    "test:script": "bash ./scripts/run_tests.sh",
     "build-css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css",
     "watch-css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
     "build-go": "go build -o bin/server ./cmd/server",
