@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
+
 	"log"
 	"net/http"
 )
@@ -14,8 +14,7 @@ func (m *Repository) DebugMenuItems(w http.ResponseWriter, r *http.Request) {
 	// Query data directly from the database
 	menuItems, err := m.DB.GetAllMenuItems()
 	if err != nil {
-		log.Printf("DEBUG ERROR: %v", err)
-		http.Error(w, fmt.Sprintf("Database error: %v", err), http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "DebugMenuItems - fetching menu items")
 		return
 	}
 

@@ -24,8 +24,9 @@ func (m *Repository) ShowLoginPage(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		log.Printf("Error rendering login template: %v", err)
-		http.Error(w, "Error rendering template", http.StatusInternalServerError)
+		// Just log the error since template.Execute likely already wrote to the response
+		log.Printf("ERROR: Template rendering failed in ShowLoginPage: %v", err)
+		return
 	}
 }
 
@@ -34,8 +35,7 @@ func (m *Repository) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	// Generate a random state token to protect against CSRF
 	state, err := generateStateToken()
 	if err != nil {
-		log.Printf("Failed to generate state token: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		m.serverError(w, err, "HandleGoogleLogin - generating state token")
 		return
 	}
 
@@ -101,16 +101,14 @@ func (m *Repository) HandleGoogleCallback(w http.ResponseWriter, r *http.Request
 	// Exchange the authorization code for a token
 	token, err := m.OAuthConfig.ExchangeCodeForToken(code)
 	if err != nil {
-		log.Printf("Failed to exchange code for token: %v", err)
-		http.Redirect(w, r, "/login?error=Authentication+failed", http.StatusSeeOther)
+		m.serverError(w, err, "HandleGoogleCallback - exchanging OAuth code")
 		return
 	}
 
 	// Get the user info from Google
 	googleUserInfo, err := m.OAuthConfig.GetUserInfo(token)
 	if err != nil {
-		log.Printf("Failed to get user info: %v", err)
-		http.Redirect(w, r, "/login?error=Failed+to+get+user+info", http.StatusSeeOther)
+		m.serverError(w, err, "HandleGoogleCallback - getting user info")
 		return
 	}
 

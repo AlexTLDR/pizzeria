@@ -6,7 +6,15 @@ services:
       - "2020:8080"
     env_file:
       - .env
+    environment:
+      - APP_ENV=production
     restart: unless-stopped
     volumes:
-      - ./db:/app/db
-      - ./static/images/menu:/app/static/images/menu
+      - pizzeria_db_data:/app/db
+      - pizzeria_images:/app/static/images/menu
+
+volumes:
+  pizzeria_db_data:
+    name: pizzeria_db_data
+  pizzeria_images:
+    name: pizzeria_images

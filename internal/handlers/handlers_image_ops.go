@@ -24,9 +24,7 @@ func (m *Repository) TestImageOperations(w http.ResponseWriter, r *http.Request)
 	testContent := "This is a test file for image operations"
 	err := os.WriteFile(testFilePath, []byte(testContent), 0644)
 	if err != nil {
-		msg := fmt.Sprintf("ERROR: Failed to create test file: %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "TestImageOperations - creating test file")
 		return
 	}
 

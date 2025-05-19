@@ -16,7 +16,7 @@ func (m *Repository) CheckDBConnection(w http.ResponseWriter, r *http.Request) {
 	if m.DB == nil {
 		msg := "ERROR: DB is nil in Repository"
 		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
+		m.adminError(w, r, fmt.Errorf("DB is nil"), http.StatusInternalServerError, "CheckDBConnection - DB check")
 		return
 	}
 
@@ -24,9 +24,7 @@ func (m *Repository) CheckDBConnection(w http.ResponseWriter, r *http.Request) {
 	var testValue int
 	err := m.DB.DB.QueryRow("SELECT 1").Scan(&testValue)
 	if err != nil {
-		msg := fmt.Sprintf("ERROR: Database ping failed: %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "CheckDBConnection - Database ping")
 		return
 	}
 
@@ -34,18 +32,14 @@ func (m *Repository) CheckDBConnection(w http.ResponseWriter, r *http.Request) {
 	var count int
 	err = m.DB.DB.QueryRow("SELECT COUNT(*) FROM menu_items").Scan(&count)
 	if err != nil {
-		msg := fmt.Sprintf("ERROR: Failed to count menu items: %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "CheckDBConnection - Counting menu items")
 		return
 	}
 
 	// Try to get menu items directly using SQL
 	rows, err := m.DB.DB.Query("SELECT id, name, description, category, price, image_url FROM menu_items")
 	if err != nil {
-		msg := fmt.Sprintf("ERROR: Failed to query menu items: %v", err)
-		log.Println(msg)
-		http.Error(w, msg, http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "CheckDBConnection - Querying menu items")
 		return
 	}
 	defer rows.Close()
