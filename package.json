@@ -4,16 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "go test ./...",
-    "test:verbose": "go test -v ./...",
-    "test:race": "go test -race ./...",
-    "test:script": "bash ./scripts/run_tests.sh",
     "build-css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css",
     "watch-css": "tailwindcss -i ./static/css/input.css -o ./static/css/output.css --watch",
-    "build-go": "go build -o bin/server ./cmd/server",
-    "dev": "concurrently \"npm run watch-css\" \"go run ./cmd/server/main.go\"",
-    "start": "npm run build-css && npm run build-go && ./bin/server",
-    "clean": "rm -rf bin static/css/output.css"
+    "dev": "concurrently \"npm run watch-css\" \"air\""
   },
   "repository": {
     "type": "git",

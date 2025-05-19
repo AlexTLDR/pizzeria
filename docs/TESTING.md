@@ -13,22 +13,22 @@ The project uses Go's built-in testing framework and follows standard Go testing
 
 ## Running Tests
 
-### Via npm scripts
+### Using Makefile
 
-The project includes several npm scripts for running tests:
+The project includes a Makefile with comprehensive test commands:
 
 ```bash
 # Run all tests
-npm test
+make test
 
 # Run tests with verbose output
-npm run test:verbose
+make test-v
 
 # Run tests with race detection
-npm run test:race
+make test-race
 
-# Run the test script (shows colored output and test details)
-npm run test:script
+# Run tests with coverage reporting
+make test-cover
 ```
 
 ### Directly with Go
@@ -109,6 +109,10 @@ func TestRepository_Home(t *testing.T) {
 To generate test coverage reports:
 
 ```bash
+# Generate and view coverage report in one command (using Makefile)
+make test-cover
+
+# Or manually with Go commands:
 # Generate coverage profile
 go test ./... -coverprofile=coverage.out
 
