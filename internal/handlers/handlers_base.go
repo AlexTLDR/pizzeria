@@ -14,8 +14,7 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	log.Println("Fetching menu items using model's GetAllMenuItems method")
 	menuItems, err := m.DB.GetAllMenuItems()
 	if err != nil {
-		log.Printf("ERROR fetching menu items: %v", err)
-		http.Error(w, "Error fetching menu items: "+err.Error(), http.StatusInternalServerError)
+		m.serverError(w, err, "Home - fetching menu items")
 		return
 	}
 	log.Printf("Retrieved %d menu items directly via SQL", len(menuItems))
@@ -24,7 +23,7 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	flashMessages, err := m.DB.GetActiveFlashMessages()
 	if err != nil {
 		// Just log the error, don't fail the page load
-		log.Printf("Error fetching flash messages: %v", err)
+		log.Printf("NOTICE: Error fetching flash messages in Home handler: %v", err)
 	}
 
 	// Group menu items by category
@@ -86,9 +85,11 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 		"Year":           time.Now().Year(),
 	})
 
-	log.Printf("Template rendered with %d menu items", len(menuItems))
-
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// Just log the error since template.Execute likely already wrote to the response
+		log.Printf("ERROR: Template rendering failed in Home: %v", err)
+		return
 	}
+	
+	log.Printf("Template rendered with %d menu items", len(menuItems))
 }

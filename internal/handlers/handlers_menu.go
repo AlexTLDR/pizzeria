@@ -61,7 +61,9 @@ func (m *Repository) ShowCreateMenuItem(w http.ResponseWriter, r *http.Request) 
 	})
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// Just log the error since template.Execute likely already wrote to the response
+		log.Printf("ERROR: Template rendering failed in ShowCreateMenuItem: %v", err)
+		return
 	}
 }
 
@@ -76,7 +78,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 	// For POST requests, parse the form data
 	err := r.ParseMultipartForm(10 << 20) // 10 MB max
 	if err != nil {
-		http.Error(w, "Could not parse form", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Could not parse form")
 		return
 	}
 
@@ -89,7 +91,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 
 	// Basic validation
 	if name == "" || description == "" || categoryRaw == "" || priceStr == "" {
-		http.Error(w, "All fields are required", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "All fields are required")
 		return
 	}
 
@@ -102,7 +104,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Parse price
 	price, err := strconv.ParseFloat(priceStr, 64)
 	if err != nil {
-		http.Error(w, "Invalid price", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Invalid price")
 		return
 	}
 
@@ -111,7 +113,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 	if smallPriceStr != "" {
 		smallPriceValue, err := strconv.ParseFloat(smallPriceStr, 64)
 		if err != nil {
-			http.Error(w, "Invalid small price", http.StatusBadRequest)
+			m.clientError(w, http.StatusBadRequest, "Invalid small price")
 			return
 		}
 		smallPrice = &smallPriceValue
@@ -134,7 +136,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 		filePath := filepath.Join("static", "images", "menu", filename)
 		dst, err := os.Create(filePath)
 		if err != nil {
-			http.Error(w, "Could not save image", http.StatusInternalServerError)
+			m.adminError(w, r, err, http.StatusInternalServerError, "CreateMenuItem - saving image")
 			return
 		}
 		defer dst.Close()
@@ -142,7 +144,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 		// Copy the file content
 		_, err = dst.ReadFrom(file)
 		if err != nil {
-			http.Error(w, "Could not save image", http.StatusInternalServerError)
+			m.adminError(w, r, err, http.StatusInternalServerError, "CreateMenuItem - saving image")
 			return
 		}
 
@@ -163,7 +165,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Save to database
 	_, err = m.DB.InsertMenuItem(item)
 	if err != nil {
-		http.Error(w, "Could not save menu item", http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "CreateMenuItem - saving menu item")
 		return
 	}
 
@@ -177,14 +179,14 @@ func (m *Repository) ShowEditMenuItem(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path[len("/admin/menu/edit/"):]
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
 	// Get the menu item
 	item, err := m.DB.GetMenuItemByID(idInt)
 	if err != nil {
-		http.Error(w, "Menu item not found", http.StatusNotFound)
+		m.clientError(w, http.StatusNotFound, "Menu item not found")
 		return
 	}
 
@@ -197,7 +199,9 @@ func (m *Repository) ShowEditMenuItem(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// Just log the error since template.Execute likely already wrote to the response
+		log.Printf("ERROR: Template rendering failed in ShowEditMenuItem: %v", err)
+		return
 	}
 }
 
@@ -207,7 +211,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path[len("/admin/menu/update/"):]
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
@@ -220,14 +224,14 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Get existing item to check for image changes
 	existingItem, err := m.DB.GetMenuItemByID(idInt)
 	if err != nil {
-		http.Error(w, "Menu item not found", http.StatusNotFound)
+		m.clientError(w, http.StatusNotFound, "Menu item not found")
 		return
 	}
 
 	// Parse the form data
 	err = r.ParseMultipartForm(10 << 20) // 10 MB max
 	if err != nil {
-		http.Error(w, "Could not parse form", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Could not parse form")
 		return
 	}
 
@@ -241,7 +245,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 
 	// Basic validation
 	if name == "" || description == "" || categoryRaw == "" || priceStr == "" {
-		http.Error(w, "All fields are required", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "All fields are required")
 		return
 	}
 
@@ -254,7 +258,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Parse price
 	price, err := strconv.ParseFloat(priceStr, 64)
 	if err != nil {
-		http.Error(w, "Invalid price", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Invalid price")
 		return
 	}
 
@@ -263,7 +267,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	if smallPriceStr != "" {
 		smallPriceValue, err := strconv.ParseFloat(smallPriceStr, 64)
 		if err != nil {
-			http.Error(w, "Invalid small price", http.StatusBadRequest)
+			m.clientError(w, http.StatusBadRequest, "Invalid small price")
 			return
 		}
 		smallPrice = &smallPriceValue
@@ -303,7 +307,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 			filePath := filepath.Join("static", "images", "menu", filename)
 			dst, err := os.Create(filePath)
 			if err != nil {
-				http.Error(w, "Could not save image", http.StatusInternalServerError)
+				m.adminError(w, r, err, http.StatusInternalServerError, "UpdateMenuItem - saving image")
 				return
 			}
 			defer dst.Close()
@@ -311,7 +315,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 			// Copy the file content
 			_, err = dst.ReadFrom(file)
 			if err != nil {
-				http.Error(w, "Could not save image", http.StatusInternalServerError)
+				m.adminError(w, r, err, http.StatusInternalServerError, "UpdateMenuItem - saving image")
 				return
 			}
 
@@ -334,7 +338,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Update in database
 	err = m.DB.UpdateMenuItem(item)
 	if err != nil {
-		http.Error(w, "Could not update menu item", http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "UpdateMenuItem - updating menu item")
 		return
 	}
 
@@ -348,7 +352,7 @@ func (m *Repository) DeleteMenuItem(w http.ResponseWriter, r *http.Request) {
 	id := r.URL.Path[len("/admin/menu/delete/"):]
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
@@ -361,7 +365,7 @@ func (m *Repository) DeleteMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Delete from database
 	err = m.DB.DeleteMenuItem(idInt)
 	if err != nil {
-		http.Error(w, "Could not delete menu item", http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "DeleteMenuItem - deleting menu item")
 		return
 	}
 

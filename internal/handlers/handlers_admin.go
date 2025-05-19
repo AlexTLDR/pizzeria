@@ -16,8 +16,7 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	log.Println("Querying menu items directly from DB in AdminDashboard handler")
 	rows, err := m.DB.DB.Query("SELECT id, name, description, category, price, image_url FROM menu_items")
 	if err != nil {
-		log.Printf("ERROR querying menu items: %v", err)
-		http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "AdminDashboard - querying menu items")
 		return
 	}
 	defer rows.Close()
@@ -38,7 +37,7 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	// Get flash messages
 	flashMessages, err := m.DB.GetAllFlashMessages() // Changed to get all messages for admin
 	if err != nil {
-		http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "AdminDashboard - fetching flash messages")
 		return
 	}
 	flashCount := len(flashMessages)
@@ -54,8 +53,9 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		log.Printf("ERROR rendering admin dashboard template: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		// Just log the error since template.Execute likely already wrote to the response
+		log.Printf("ERROR: Template rendering failed in AdminDashboard: %v", err)
+		return
 	}
 
 	log.Printf("Admin dashboard rendered with %d menu items", len(menuItems))
@@ -66,7 +66,7 @@ func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) 
 	// Parse form data
 	err := r.ParseForm()
 	if err != nil {
-		http.Error(w, "Could not parse form", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Could not parse form")
 		return
 	}
 
@@ -79,13 +79,13 @@ func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) 
 	layout := "2006-01-02"
 	startDate, err := time.Parse(layout, startDateStr)
 	if err != nil {
-		http.Error(w, "Invalid start date", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Invalid start date")
 		return
 	}
 
 	endDate, err := time.Parse(layout, endDateStr)
 	if err != nil {
-		http.Error(w, "Invalid end date", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Invalid end date")
 		return
 	}
 
@@ -117,14 +117,14 @@ func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) 
 	)
 
 	if err != nil {
-		http.Error(w, "Could not save flash message: "+err.Error(), http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "CreateFlashMessage - saving message")
 		return
 	}
 
 	// Get the last inserted ID
 	_, err = result.LastInsertId()
 	if err != nil {
-		http.Error(w, "Could not get inserted ID: "+err.Error(), http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "CreateFlashMessage - getting inserted ID")
 		return
 	}
 
@@ -138,14 +138,14 @@ func (m *Repository) DeleteFlashMessage(w http.ResponseWriter, r *http.Request) 
 	idStr := r.URL.Path[len("/admin/flash-message/delete/"):]
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		http.Error(w, "Invalid ID", http.StatusBadRequest)
+		m.clientError(w, http.StatusBadRequest, "Invalid ID")
 		return
 	}
 
 	// Delete the flash message
 	err = m.DB.DeleteFlashMessage(id)
 	if err != nil {
-		http.Error(w, "Could not delete flash message", http.StatusInternalServerError)
+		m.adminError(w, r, err, http.StatusInternalServerError, "DeleteFlashMessage - deleting message")
 		return
 	}
 
