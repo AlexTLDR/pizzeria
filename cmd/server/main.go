@@ -50,7 +50,7 @@ func main() {
 	// Determine environment (development or production)
 	appEnv := os.Getenv("APP_ENV")
 	isProduction := appEnv == "production"
-	
+
 	if isProduction {
 		log.Println("Running in PRODUCTION mode - debug endpoints disabled")
 	} else {
@@ -138,7 +138,6 @@ func authenticatedRedirect(w http.ResponseWriter, r *http.Request) {
 
 // authenticatedAdmin handles all admin routes with auth protection
 func authenticatedAdmin(w http.ResponseWriter, r *http.Request) {
-	// Very important debug log
 	log.Printf("Admin route requested: %s", r.URL.Path)
 
 	// First check if user is authenticated
