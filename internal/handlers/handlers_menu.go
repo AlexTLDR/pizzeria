@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/AlexTLDR/pizzeria/internal/models"
+	"github.com/google/uuid"
 )
 
 // deleteImageFile safely deletes an image file
@@ -22,9 +23,7 @@ func (m *Repository) deleteImageFile(imageURL string) {
 	}
 
 	// Remove the leading slash if present
-	if strings.HasPrefix(imageURL, "/") {
-		imageURL = imageURL[1:]
-	}
+	imageURL = strings.TrimPrefix(imageURL, "/")
 
 	// Make sure the file exists and is within the menu images directory
 	if !strings.Contains(imageURL, "static/images/menu") {
@@ -65,6 +64,56 @@ func (m *Repository) ShowCreateMenuItem(w http.ResponseWriter, r *http.Request) 
 		log.Printf("ERROR: Template rendering failed in ShowCreateMenuItem: %v", err)
 		return
 	}
+}
+
+// ShowEditMenuItem displays the edit menu item form
+func (m *Repository) ShowEditMenuItem(w http.ResponseWriter, r *http.Request) {
+	// Extract ID from URL
+	id := r.URL.Path[len("/admin/menu/edit/"):]
+	idInt, err := strconv.Atoi(id)
+	if err != nil {
+		m.clientError(w, http.StatusBadRequest, "Invalid ID")
+		return
+	}
+
+	// Get the menu item
+	item, err := m.DB.GetMenuItemByID(idInt)
+	if err != nil {
+		m.clientError(w, http.StatusNotFound, "Menu item not found")
+		return
+	}
+
+	// Render the menu form template
+	err = m.TemplateCache["menu-form.html"].Execute(w, map[string]interface{}{
+		"Title":    "Edit Menu Item",
+		"FormType": "edit",
+		"Item":     item,
+		"Year":     time.Now().Year(),
+	})
+
+	if err != nil {
+		// Just log the error since template.Execute likely already wrote to the response
+		log.Printf("ERROR: Template rendering failed in ShowEditMenuItem: %v", err)
+		return
+	}
+}
+
+// isValidImageExtension checks if the file has an allowed image extension
+func (m *Repository) isValidImageExtension(filename string) bool {
+	extension := strings.ToLower(filepath.Ext(filename))
+
+	// Define allowed image extensions
+	allowedExtensions := map[string]bool{
+		".jpg":  true,
+		".jpeg": true,
+		".png":  true,
+		".gif":  true,
+		".webp": true,
+		".bmp":  true,
+		".svg":  true,
+	}
+
+	return allowedExtensions[extension]
 }
 
 // CreateMenuItem handles the create menu item form submission
@@ -125,15 +174,19 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		defer file.Close()
 
-		// Create unique filename based on timestamp
-		timestamp := time.Now().Unix()
-		filename := fmt.Sprintf("%d_%s", timestamp, header.Filename)
+		// Validate that the file is an image
+		if !m.isValidImageExtension(header.Filename) {
+			m.clientError(w, http.StatusBadRequest, "Invalid file type. Only image files (jpg, jpeg, png, gif, webp, bmp, svg) are allowed.")
+			return
+		}
 
-		// Ensure filename contains only valid characters
-		filename = strings.ReplaceAll(filename, " ", "-")
+		// Create a completely random filename with timestamp prefix
+		timestamp := time.Now().Unix()
+		extension := filepath.Ext(header.Filename) // Get the file extension
+		randomName := fmt.Sprintf("%d_%s%s", timestamp, uuid.New().String(), extension)
 
 		// Save the file
-		filePath := filepath.Join("static", "images", "menu", filename)
+		filePath := filepath.Join("static", "images", "menu", randomName)
 		dst, err := os.Create(filePath)
 		if err != nil {
 			m.adminError(w, r, err, http.StatusInternalServerError, "CreateMenuItem - saving image")
@@ -171,38 +224,6 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 
 	// Redirect to admin dashboard
 	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
-}
-
-// ShowEditMenuItem displays the edit menu item form
-func (m *Repository) ShowEditMenuItem(w http.ResponseWriter, r *http.Request) {
-	// Extract ID from URL
-	id := r.URL.Path[len("/admin/menu/edit/"):]
-	idInt, err := strconv.Atoi(id)
-	if err != nil {
-		m.clientError(w, http.StatusBadRequest, "Invalid ID")
-		return
-	}
-
-	// Get the menu item
-	item, err := m.DB.GetMenuItemByID(idInt)
-	if err != nil {
-		m.clientError(w, http.StatusNotFound, "Menu item not found")
-		return
-	}
-
-	// Render the menu form template
-	err = m.TemplateCache["menu-form.html"].Execute(w, map[string]interface{}{
-		"Title":    "Edit Menu Item",
-		"FormType": "edit",
-		"Item":     item,
-		"Year":     time.Now().Year(),
-	})
-
-	if err != nil {
-		// Just log the error since template.Execute likely already wrote to the response
-		log.Printf("ERROR: Template rendering failed in ShowEditMenuItem: %v", err)
-		return
-	}
 }
 
 // UpdateMenuItem handles the update menu item form submission
@@ -291,20 +312,24 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 		if err == nil {
 			defer file.Close()
 
+			// Validate that the file is an image
+			if !m.isValidImageExtension(header.Filename) {
+				m.clientError(w, http.StatusBadRequest, "Invalid file type. Only image files (jpg, jpeg, png, gif, webp, bmp, svg) are allowed.")
+				return
+			}
+
 			// If we're changing the image, delete the old one
 			if existingItem.ImageURL != "" {
 				m.deleteImageFile(existingItem.ImageURL)
 			}
 
-			// Create unique filename based on timestamp
+			// Create a completely random filename with timestamp prefix
 			timestamp := time.Now().Unix()
-			filename := fmt.Sprintf("%d_%s", timestamp, header.Filename)
-
-			// Ensure filename contains only valid characters
-			filename = strings.ReplaceAll(filename, " ", "-")
+			extension := filepath.Ext(header.Filename) // Get the file extension
+			randomName := fmt.Sprintf("%d_%s%s", timestamp, uuid.New().String(), extension)
 
 			// Save the file
-			filePath := filepath.Join("static", "images", "menu", filename)
+			filePath := filepath.Join("static", "images", "menu", randomName)
 			dst, err := os.Create(filePath)
 			if err != nil {
 				m.adminError(w, r, err, http.StatusInternalServerError, "UpdateMenuItem - saving image")
