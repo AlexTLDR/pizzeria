@@ -18,3 +18,5 @@ static/css/output.css
 # Ignore air tmp folder
 /tmp
 
+# IDE stuff
+/.idea
