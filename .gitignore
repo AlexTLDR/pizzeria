@@ -17,6 +17,3 @@ static/css/output.css
 
 # Ignore air tmp folder
 /tmp
-
-# Ignore JetBrains IDE files
-.idea
