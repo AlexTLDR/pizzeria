@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@tailwind utilities;
+@import "tailwindcss/utilities";
 
 @layer components {
     .gradient-background {

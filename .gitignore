@@ -17,3 +17,9 @@ static/css/output.css
 
 # Ignore air tmp folder
 /tmp
+
+# Ignore node_modules folder
+node_modules
+
+# Ignore .DS_Store files
+.DS_Store
