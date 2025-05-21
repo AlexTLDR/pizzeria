@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	// Initialize the application
+	// Initialize the application (encapsulates .env loading, DB, OAuth setup)
 	application, err := app.New()
 	if err != nil {
 		log.Fatalf("Failed to initialize application: %v", err)
@@ -22,4 +22,3 @@ func main() {
 	log.Println("Server starting on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", handler))
 }
-

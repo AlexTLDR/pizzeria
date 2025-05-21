@@ -5,7 +5,7 @@
 *.exe
 *.out
 
-# Ignore database files and menu pictures 
+# Ignore database files and menu pictures
 *.db
 #/static/images/menu
 # Ignore Go build files
@@ -17,6 +17,3 @@ static/css/output.css
 
 # Ignore air tmp folder
 /tmp
-
-# IDE stuff
-/.idea
