@@ -9,14 +9,16 @@ import (
 )
 
 // Home handles the home page
-func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) Home(w http.ResponseWriter, _ *http.Request) {
 	// Use the model's method to get menu items - this properly handles NULL small_price values
 	log.Println("Fetching menu items using model's GetAllMenuItems method")
+
 	menuItems, err := m.DB.GetAllMenuItems()
 	if err != nil {
 		m.serverError(w, err, "Home - fetching menu items")
 		return
 	}
+
 	log.Printf("Retrieved %d menu items directly via SQL", len(menuItems))
 
 	// Get active flash messages
@@ -28,11 +30,13 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 
 	// Group menu items by category
 	menuByCategory := make(map[string][]models.MenuItem)
+
 	var categories []string
+
 	categorySet := make(map[string]bool)
 
-	// Create a new slice for simplified menu items
-	var simplifiedMenuItems []models.MenuItem
+	// Create a new slice for simplified menu items with pre-allocation
+	simplifiedMenuItems := make([]models.MenuItem, 0, len(menuItems))
 
 	// First, collect all unique categories and map full category names to simple ones for the template
 	for _, item := range menuItems {
@@ -90,6 +94,6 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 		log.Printf("ERROR: Template rendering failed in Home: %v", err)
 		return
 	}
-	
+
 	log.Printf("Template rendered with %d menu items", len(menuItems))
 }

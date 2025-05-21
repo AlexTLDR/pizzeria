@@ -11,8 +11,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/AlexTLDR/pizzeria/internal/models"
 	"github.com/google/uuid"
+
+	"github.com/AlexTLDR/pizzeria/internal/models"
 )
 
 // deleteImageFile safely deletes an image file
@@ -51,7 +52,7 @@ func (m *Repository) deleteImageFile(imageURL string) {
 }
 
 // ShowCreateMenuItem displays the create menu item form
-func (m *Repository) ShowCreateMenuItem(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) ShowCreateMenuItem(w http.ResponseWriter, _ *http.Request) {
 	// Render the menu form template
 	err := m.TemplateCache["menu-form.html"].Execute(w, map[string]interface{}{
 		"Title":    "Create Menu Item",
@@ -70,6 +71,7 @@ func (m *Repository) ShowCreateMenuItem(w http.ResponseWriter, r *http.Request) 
 func (m *Repository) ShowEditMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL
 	id := r.URL.Path[len("/admin/menu/edit/"):]
+
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		m.clientError(w, http.StatusBadRequest, "Invalid ID")
@@ -159,17 +161,20 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 
 	// Parse small price if provided
 	var smallPrice *float64
+
 	if smallPriceStr != "" {
 		smallPriceValue, err := strconv.ParseFloat(smallPriceStr, 64)
 		if err != nil {
 			m.clientError(w, http.StatusBadRequest, "Invalid small price")
 			return
 		}
+
 		smallPrice = &smallPriceValue
 	}
 
 	// Handle the uploaded image
 	var imageURL string
+
 	file, header, err := r.FormFile("image_upload")
 	if err == nil {
 		defer file.Close()
@@ -187,11 +192,13 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 
 		// Save the file
 		filePath := filepath.Join("static", "images", "menu", randomName)
+
 		dst, err := os.Create(filePath)
 		if err != nil {
 			m.adminError(w, r, err, http.StatusInternalServerError, "CreateMenuItem - saving image")
 			return
 		}
+
 		defer dst.Close()
 
 		// Copy the file content
@@ -230,6 +237,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL
 	id := r.URL.Path[len("/admin/menu/update/"):]
+
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		m.clientError(w, http.StatusBadRequest, "Invalid ID")
@@ -285,12 +293,14 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 
 	// Parse small price if provided
 	var smallPrice *float64
+
 	if smallPriceStr != "" {
 		smallPriceValue, err := strconv.ParseFloat(smallPriceStr, 64)
 		if err != nil {
 			m.clientError(w, http.StatusBadRequest, "Invalid small price")
 			return
 		}
+
 		smallPrice = &smallPriceValue
 	}
 
@@ -301,10 +311,12 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	if removeImage == "yes" && existingItem.ImageURL != "" {
 		// Delete the existing image
 		m.deleteImageFile(existingItem.ImageURL)
+
 		imageURL = "" // Set image URL to empty
 	} else {
 		// Check if a new image was uploaded
 		var file multipart.File
+
 		var header *multipart.FileHeader
 		file, header, err = r.FormFile("image_upload")
 
@@ -330,11 +342,13 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 
 			// Save the file
 			filePath := filepath.Join("static", "images", "menu", randomName)
+
 			dst, err := os.Create(filePath)
 			if err != nil {
 				m.adminError(w, r, err, http.StatusInternalServerError, "UpdateMenuItem - saving image")
 				return
 			}
+
 			defer dst.Close()
 
 			// Copy the file content
@@ -375,6 +389,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) DeleteMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL
 	id := r.URL.Path[len("/admin/menu/delete/"):]
+
 	idInt, err := strconv.Atoi(id)
 	if err != nil {
 		m.clientError(w, http.StatusBadRequest, "Invalid ID")

@@ -14,11 +14,13 @@ import (
 func (m *Repository) ShowGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	// Generate a random state parameter for CSRF protection
 	b := make([]byte, 16)
+
 	_, err := rand.Read(b)
 	if err != nil {
 		http.Error(w, "Could not generate state parameter", http.StatusInternalServerError)
 		return
 	}
+
 	state := base64.URLEncoding.EncodeToString(b)
 
 	// Store state in a cookie for verification later
@@ -69,6 +71,7 @@ func (m *Repository) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	if expectedState != actualState {
 		log.Printf("Invalid state parameter: expected %s, got %s", expectedState, actualState)
 		http.Redirect(w, r, "/login?error=Invalid state parameter", http.StatusSeeOther)
+
 		return
 	}
 
@@ -93,6 +96,7 @@ func (m *Repository) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Error exchanging code for token: %v", err)
 		http.Redirect(w, r, "/login?error=Failed to authenticate", http.StatusSeeOther)
+
 		return
 	}
 
@@ -101,6 +105,7 @@ func (m *Repository) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("Error getting user info: %v", err)
 		http.Redirect(w, r, "/login?error=Failed to get user information", http.StatusSeeOther)
+
 		return
 	}
 
@@ -108,6 +113,7 @@ func (m *Repository) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	if !m.OAuthConfig.IsAllowedEmail(userInfo.Email) {
 		log.Printf("Unauthorized access attempt by: %s", userInfo.Email)
 		http.Redirect(w, r, "/login?error=You are not authorized to access the admin area", http.StatusSeeOther)
+
 		return
 	}
 

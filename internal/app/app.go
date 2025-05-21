@@ -9,14 +9,15 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/joho/godotenv"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/pressly/goose/v3"
+
 	"github.com/AlexTLDR/pizzeria/db"
 	"github.com/AlexTLDR/pizzeria/internal/auth"
 	"github.com/AlexTLDR/pizzeria/internal/handlers"
 	"github.com/AlexTLDR/pizzeria/internal/middleware"
 	"github.com/AlexTLDR/pizzeria/internal/models"
-	"github.com/joho/godotenv"
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/pressly/goose/v3"
 )
 
 type Application struct {
@@ -59,6 +60,7 @@ func New() (*Application, error) {
 	if err := middleware.InitializeOAuth(); err != nil {
 		log.Printf("OAuth initialization error: %v", err)
 	}
+
 	oauthConfig := middleware.GetOAuthConfig()
 
 	// Initialize templates
@@ -82,7 +84,9 @@ func New() (*Application, error) {
 // Close closes the application resources
 func (app *Application) Close() {
 	if app.DB != nil {
-		app.DB.Close()
+		if err := app.DB.Close(); err != nil {
+			log.Printf("Error closing database connection: %v", err)
+		}
 	}
 }
 
@@ -174,6 +178,7 @@ func authenticatedAdmin(w http.ResponseWriter, r *http.Request) {
 	if !valid {
 		log.Println("Invalid or expired session, redirecting to login")
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
+
 		return
 	}
 
@@ -182,6 +187,7 @@ func authenticatedAdmin(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Unauthorized access attempt by: %s", userEmail)
 		middleware.ClearSecureSessionCookie(w)
 		http.Error(w, "Unauthorized: Access denied", http.StatusForbidden)
+
 		return
 	}
 

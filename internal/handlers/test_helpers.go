@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"fmt"
 	"html/template"
 	"io"
 	"net/http"
@@ -23,9 +24,10 @@ func createMockTemplates() map[string]*template.Template {
 			return 0
 		},
 	}
-	
+
 	indexTemplate := template.New("index.html").Funcs(funcMap)
-	indexTemplate, _ = indexTemplate.Parse(`<!DOCTYPE html>
+	var err error
+	indexTemplate, err = indexTemplate.Parse(`<!DOCTYPE html>
 <html>
 <head><title>Mock Index Template</title></head>
 <body>
@@ -33,29 +35,41 @@ func createMockTemplates() map[string]*template.Template {
   <div>This is mock content for testing the Home handler</div>
 </body>
 </html>`)
-	
+	if err != nil {
+		panic(err) // In tests, we can panic on template parsing errors
+	}
+
 	adminTemplate := template.New("admin-dashboard.html").Funcs(funcMap)
-	adminTemplate, _ = adminTemplate.Parse(`<html><body>Mock Admin Dashboard</body></html>`)
-	
+	adminTemplate, err = adminTemplate.Parse(`<html><body>Mock Admin Dashboard</body></html>`)
+	if err != nil {
+		panic(err)
+	}
+
 	loginTemplate := template.New("login.html").Funcs(funcMap)
-	loginTemplate, _ = loginTemplate.Parse(`<html><body>Mock Login Page</body></html>`)
-	
+	loginTemplate, err = loginTemplate.Parse(`<html><body>Mock Login Page</body></html>`)
+	if err != nil {
+		panic(err)
+	}
+
 	menuFormTemplate := template.New("menu-form.html").Funcs(funcMap)
-	menuFormTemplate, _ = menuFormTemplate.Parse(`<html><body>Mock Menu Form</body></html>`)
-	
+	menuFormTemplate, err = menuFormTemplate.Parse(`<html><body>Mock Menu Form</body></html>`)
+	if err != nil {
+		panic(err)
+	}
+
 	templateCache := map[string]*template.Template{
 		"index.html":           indexTemplate,
 		"admin-dashboard.html": adminTemplate,
 		"login.html":           loginTemplate,
 		"menu-form.html":       menuFormTemplate,
 	}
-	
+
 	return templateCache
 }
 
 func NewTestRepo(t *testing.T) *Repository {
 	templateCache := createMockTemplates()
-	
+
 	db, err := createTestDB()
 	if err != nil {
 		t.Fatalf("failed to create test DB: %v", err)
@@ -83,7 +97,7 @@ func createTestDB() (*sql.DB, error) {
 	}
 
 	dbPath := filepath.Join(tempDir, "test.db")
-	
+
 	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
 		return nil, err
@@ -113,9 +127,11 @@ func createTestDB() (*sql.DB, error) {
 			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		);
 	`)
-	
+
 	if err != nil {
-		db.Close()
+		if closeErr := db.Close(); closeErr != nil {
+			return nil, fmt.Errorf("error closing DB after exec error: %v (original error: %v)", closeErr, err)
+		}
 		return nil, err
 	}
 
@@ -127,24 +143,31 @@ func CreateTestRequest(t *testing.T, method, url string, body io.Reader) (*http.
 	if err != nil {
 		t.Fatalf("could not create request: %v", err)
 	}
-	
+
 	if method == http.MethodPost {
 		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	}
-	
+
 	rr := httptest.NewRecorder()
+
 	return req, rr
 }
 
 func CleanTestDB(repo *Repository) {
 	if repo != nil && repo.DB != nil && repo.DB.DB != nil {
 		var dbPath string
+
 		err := repo.DB.DB.QueryRow("PRAGMA database_list").Scan(nil, &dbPath, nil)
 		if err == nil && dbPath != "" {
-			repo.DB.DB.Close()
-			
+			if closeErr := repo.DB.DB.Close(); closeErr != nil {
+				// In tests, we can just log the error
+				fmt.Printf("Error closing test database: %v\n", closeErr)
+			}
+
 			if filepath.Dir(dbPath) != "." {
-				os.RemoveAll(filepath.Dir(dbPath))
+				if removeErr := os.RemoveAll(filepath.Dir(dbPath)); removeErr != nil {
+					fmt.Printf("Error removing test database directory: %v\n", removeErr)
+				}
 			}
 		}
 	}

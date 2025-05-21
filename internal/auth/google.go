@@ -46,6 +46,7 @@ func Initialize() (*OAuthConfig, error) {
 
 	// Get allowed emails
 	allowedEmailsStr := os.Getenv("ALLOWED_EMAILS")
+
 	allowedEmails := strings.Split(allowedEmailsStr, ",")
 	for i := range allowedEmails {
 		allowedEmails[i] = strings.TrimSpace(allowedEmails[i])
@@ -109,6 +110,7 @@ func (c *OAuthConfig) IsAllowedEmail(email string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -118,5 +120,6 @@ func (c *OAuthConfig) ExchangeCodeForToken(code string) (*oauth2.Token, error) {
 	if err != nil {
 		return nil, fmt.Errorf("code exchange failed: %w", err)
 	}
+
 	return token, nil
 }

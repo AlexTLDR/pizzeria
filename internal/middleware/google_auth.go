@@ -8,12 +8,21 @@ import (
 	"github.com/AlexTLDR/pizzeria/internal/auth"
 )
 
+// contextKey is a custom type for context keys to avoid collisions
+type contextKey string
+
+// Context keys
+const (
+	userEmailKey contextKey = "user_email"
+)
+
 // Initialize OAuth config
 var oauthConfig *auth.OAuthConfig
 
 // InitializeOAuth sets up the OAuth configuration
 func InitializeOAuth() error {
 	var err error
+
 	oauthConfig, err = auth.Initialize()
 	if err != nil {
 		return err
@@ -21,6 +30,7 @@ func InitializeOAuth() error {
 
 	// Initialize cookie secret for secure sessions
 	InitializeCookieSecret()
+
 	return nil
 }
 
@@ -37,6 +47,7 @@ func GoogleAuth(next http.Handler) http.Handler {
 		if !valid {
 			log.Println("Invalid or expired session, redirecting to login")
 			http.Redirect(w, r, "/login", http.StatusSeeOther)
+
 			return
 		}
 
@@ -45,20 +56,22 @@ func GoogleAuth(next http.Handler) http.Handler {
 			log.Printf("Unauthorized access attempt by: %s", userEmail)
 			ClearSecureSessionCookie(w) // Clear invalid session
 			http.Error(w, "Unauthorized: You do not have permission to access this page", http.StatusForbidden)
+
 			return
 		}
 
 		// Set the email in the request context
-		ctx := context.WithValue(r.Context(), "user_email", userEmail)
+		ctx := context.WithValue(r.Context(), userEmailKey, userEmail)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
 
 // GetUserEmail extracts the user's email from the request context
 func GetUserEmail(r *http.Request) string {
-	if email, ok := r.Context().Value("user_email").(string); ok {
+	if email, ok := r.Context().Value(userEmailKey).(string); ok {
 		return email
 	}
+
 	return ""
 }
 

@@ -46,6 +46,7 @@ func (f *FlashMessage) GetStatus() string {
 	} else if today.After(endDate) {
 		return "Expired"
 	}
+
 	return "Active"
 }
 
@@ -99,6 +100,7 @@ func (m *DBModel) GetActiveFlashMessages() ([]FlashMessage, error) {
 
 	for rows.Next() {
 		var msg FlashMessage
+
 		err := rows.Scan(
 			&msg.ID,
 			&msg.Type,
@@ -117,6 +119,11 @@ func (m *DBModel) GetActiveFlashMessages() ([]FlashMessage, error) {
 		msg.Status = msg.GetStatus()
 
 		messages = append(messages, msg)
+	}
+
+	// Check for errors encountered during iteration
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return messages, nil
@@ -141,6 +148,7 @@ func (m *DBModel) GetAllFlashMessages() ([]FlashMessage, error) {
 
 	for rows.Next() {
 		var msg FlashMessage
+
 		err := rows.Scan(
 			&msg.ID,
 			&msg.Type,
@@ -151,14 +159,17 @@ func (m *DBModel) GetAllFlashMessages() ([]FlashMessage, error) {
 			&msg.CreatedAt,
 			&msg.UpdatedAt,
 		)
+
 		if err != nil {
 			return nil, err
 		}
 
-		// Set the status based on date range
-		msg.Status = msg.GetStatus()
-
 		messages = append(messages, msg)
+	}
+
+	// Check for errors encountered during iteration
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return messages, nil
@@ -171,5 +182,6 @@ func (m *DBModel) DeleteFlashMessage(id int) error {
 
 	stmt := `DELETE FROM flash_messages WHERE id = ?`
 	_, err := m.DB.ExecContext(ctx, stmt, id)
+
 	return err
 }

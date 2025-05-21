@@ -63,6 +63,7 @@ func (m *Repository) HandleGoogleCallback(w http.ResponseWriter, r *http.Request
 	if state == "" {
 		log.Println("No state token in callback")
 		http.Redirect(w, r, "/login?error=Invalid+authentication+attempt", http.StatusSeeOther)
+
 		return
 	}
 
@@ -71,6 +72,7 @@ func (m *Repository) HandleGoogleCallback(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		log.Printf("State cookie not found: %v", err)
 		http.Redirect(w, r, "/login?error=Invalid+authentication+attempt", http.StatusSeeOther)
+
 		return
 	}
 
@@ -78,6 +80,7 @@ func (m *Repository) HandleGoogleCallback(w http.ResponseWriter, r *http.Request
 	if state != stateCookie.Value {
 		log.Printf("State mismatch: %s vs %s", state, stateCookie.Value)
 		http.Redirect(w, r, "/login?error=Invalid+authentication+attempt", http.StatusSeeOther)
+
 		return
 	}
 
@@ -95,6 +98,7 @@ func (m *Repository) HandleGoogleCallback(w http.ResponseWriter, r *http.Request
 	if code == "" {
 		log.Println("No code in callback")
 		http.Redirect(w, r, "/login?error=Authentication+failed", http.StatusSeeOther)
+
 		return
 	}
 
@@ -116,6 +120,7 @@ func (m *Repository) HandleGoogleCallback(w http.ResponseWriter, r *http.Request
 	if !googleUserInfo.VerifiedEmail {
 		log.Printf("Email not verified: %s", googleUserInfo.Email)
 		http.Redirect(w, r, "/login?error=Email+not+verified", http.StatusSeeOther)
+
 		return
 	}
 
@@ -123,6 +128,7 @@ func (m *Repository) HandleGoogleCallback(w http.ResponseWriter, r *http.Request
 	if !m.OAuthConfig.IsAllowedEmail(googleUserInfo.Email) {
 		log.Printf("Unauthorized email: %s", googleUserInfo.Email)
 		http.Redirect(w, r, "/login?error=Unauthorized+email", http.StatusSeeOther)
+
 		return
 	}
 
@@ -146,6 +152,7 @@ func (m *Repository) HandleLogout(w http.ResponseWriter, r *http.Request) {
 func generateStateToken() (string, error) {
 	// Generate 32 bytes of random data
 	b := make([]byte, 32)
+
 	_, err := rand.Read(b)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate random bytes: %w", err)

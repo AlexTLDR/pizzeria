@@ -1,0 +1,75 @@
+# golangci-lint configuration
+# See https://golangci-lint.run/usage/configuration/ for more information
+
+linters-settings:
+  gofmt:
+    simplify: true
+  goimports:
+    local-prefixes: github.com/AlexTLDR/pizzeria
+  gocyclo:
+    min-complexity: 30
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  gocritic:
+    disabled-checks:
+      - hugeParam
+      - rangeValCopy
+      - sloppyReassign
+      - emptyStringTest
+      - ifElseChain
+      - returnAfterHttpError
+  revive:
+    rules:
+      - name: unused-parameter
+        disabled: true
+      - name: unhandled-error
+        disabled: true
+      - name: unexported-return
+        disabled: true
+
+linters:
+  disable-all: true
+  enable:
+    # Essential linters
+    - errcheck
+    - gofmt
+    - goimports
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - typecheck
+    - unused
+    
+    # Additional helpful linters
+    - bodyclose
+
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - typecheck
+        - errcheck
+        - govet
+        - staticcheck
+    - path: internal/handlers/handlers_base\.go
+      linters:
+        - gocritic
+    - path: internal/models/
+      linters:
+        - rowserrcheck
+  
+  # Directories to skip
+  exclude-dirs:
+    - node_modules
+    - bin
+    - static/css
+  
+  max-issues-per-linter: 0
+  max-same-issues: 0
+
+run:
+  timeout: 5m
+  tests: false
+  go: "1.18"

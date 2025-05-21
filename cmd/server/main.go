@@ -20,5 +20,8 @@ func main() {
 
 	// Start the server
 	log.Println("Server starting on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	err = http.ListenAndServe(":8080", handler)
+	if err != nil {
+		log.Printf("Server error: %v\n", err)
+	}
 }
