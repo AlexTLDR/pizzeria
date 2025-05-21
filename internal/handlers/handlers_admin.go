@@ -14,23 +14,35 @@ import (
 func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	// Direct SQL query as a fallback/temporary solution
 	log.Println("Querying menu items directly from DB in AdminDashboard handler")
+
 	rows, err := m.DB.DB.Query("SELECT id, name, description, category, price, image_url FROM menu_items")
 	if err != nil {
 		m.adminError(w, r, err, http.StatusInternalServerError, "AdminDashboard - querying menu items")
 		return
 	}
+
 	defer rows.Close()
 
 	var menuItems []models.MenuItem
+
 	for rows.Next() {
 		var item models.MenuItem
+
 		err := rows.Scan(&item.ID, &item.Name, &item.Description, &item.Category, &item.Price, &item.ImageURL)
 		if err != nil {
 			log.Printf("ERROR scanning menu item: %v", err)
 			continue
 		}
+
 		menuItems = append(menuItems, item)
 	}
+
+	// Check for errors during iteration
+	if err := rows.Err(); err != nil {
+		m.adminError(w, r, err, http.StatusInternalServerError, "AdminDashboard - iterating menu items")
+		return
+	}
+
 	log.Printf("Retrieved %d menu items directly via SQL", len(menuItems))
 	menuItemCount := len(menuItems)
 
@@ -40,6 +52,7 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 		m.adminError(w, r, err, http.StatusInternalServerError, "AdminDashboard - fetching flash messages")
 		return
 	}
+
 	flashCount := len(flashMessages)
 
 	// Render the dashboard template
@@ -77,6 +90,7 @@ func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) 
 
 	// Parse dates
 	layout := "2006-01-02"
+
 	startDate, err := time.Parse(layout, startDateStr)
 	if err != nil {
 		m.clientError(w, http.StatusBadRequest, "Invalid start date")
@@ -136,6 +150,7 @@ func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) 
 func (m *Repository) DeleteFlashMessage(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL
 	idStr := r.URL.Path[len("/admin/flash-message/delete/"):]
+
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
 		m.clientError(w, http.StatusBadRequest, "Invalid ID")

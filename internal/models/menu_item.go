@@ -50,7 +50,13 @@ func (m *DBModel) GetAllMenuItems() ([]MenuItem, error) {
 		if err != nil {
 			return nil, err
 		}
+
 		items = append(items, item)
+	}
+
+	// Check for errors encountered during iteration
+	if err = rows.Err(); err != nil {
+		return nil, err
 	}
 
 	return items, nil
@@ -65,6 +71,7 @@ func (m *DBModel) GetMenuItemByID(id int) (MenuItem, error) {
               created_at, updated_at FROM menu_items WHERE id = ?`
 
 	var item MenuItem
+
 	row := m.DB.QueryRowContext(ctx, query, id)
 
 	err := row.Scan(
@@ -150,5 +157,6 @@ func (m *DBModel) DeleteMenuItem(id int) error {
 
 	stmt := `DELETE FROM menu_items WHERE id = ?`
 	_, err := m.DB.ExecContext(ctx, stmt, id)
+
 	return err
 }

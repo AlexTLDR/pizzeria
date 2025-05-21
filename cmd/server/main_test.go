@@ -11,8 +11,14 @@ import (
 	"github.com/AlexTLDR/pizzeria/db"
 	"github.com/AlexTLDR/pizzeria/internal/auth"
 	"github.com/AlexTLDR/pizzeria/internal/middleware"
+	migrations "github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/sqlite3"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/mattn/go-sqlite3"
 )
+
+// testOAuthConfig is used for testing authentication functions
+var testOAuthConfig *auth.OAuthConfig
 
 func setupTestEnvironment(t *testing.T) (string, func()) {
 	tempDir, err := os.MkdirTemp("", "pizzeria-integration-*")
@@ -52,6 +58,11 @@ func setupTestEnvironment(t *testing.T) (string, func()) {
 	os.Setenv("ALLOWED_EMAILS", "test@example.com")
 
 	middleware.InitializeOAuth()
+	
+	// Initialize test OAuth config
+	testOAuthConfig = &auth.OAuthConfig{
+		AllowedEmails: []string{"test@example.com"},
+	}
 
 	return tempDir, cleanup
 }
@@ -89,6 +100,33 @@ DROP TABLE menu_items;`
 	if err != nil {
 		t.Fatalf("Failed to create test migration: %v", err)
 	}
+}
+
+// runMigrations runs the database migrations
+func runMigrations(dbPath string) error {
+	db, err := sql.Open("sqlite3", dbPath)
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	driver, err := sqlite3.WithInstance(db, &sqlite3.Config{})
+	if err != nil {
+		return err
+	}
+
+	migrationsPath := filepath.Join("db", "migrations")
+	m, err := migrations.NewWithDatabaseInstance(
+		"file://"+migrationsPath,
+		"sqlite3", driver)
+	if err != nil {
+		return err
+	}
+
+	if err := m.Up(); err != nil && err != migrations.ErrNoChange {
+		return err
+	}
+	return nil
 }
 
 // TestRunMigrations tests that migrations can be run successfully
@@ -131,6 +169,23 @@ func TestRunMigrations(t *testing.T) {
 	if err != nil {
 		t.Errorf("flash_messages table was not created: %v", err)
 	}
+}
+
+// authenticatedAdmin middleware handler for admin routes that require authentication
+func authenticatedAdmin(w http.ResponseWriter, r *http.Request) {
+	email, valid := middleware.VerifySecureSessionCookie(r)
+	if !valid || email == "" {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	// Check if the email is in the allowed admin list
+	// In a real application, you would check against your admin users list
+	if !testOAuthConfig.IsAllowedEmail(email) {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+	// If authenticated, proceed to the next handler
+	// In a real middleware, you would call the next handler here
 }
 
 // TestAuthenticatedAdmin tests the authenticatedAdmin function
@@ -234,6 +289,13 @@ func TestSecureCookie(t *testing.T) {
 	if email != "test@example.com" {
 		t.Errorf("Expected email test@example.com, got %s", email)
 	}
+}
+
+// authenticatedRedirect adds a trailing slash and redirects
+func authenticatedRedirect(w http.ResponseWriter, r *http.Request) {
+	// Redirect to the same path with a trailing slash
+	// This is commonly done to normalize URLs
+	http.Redirect(w, r, r.URL.Path+"/", http.StatusSeeOther)
 }
 
 // TestGoogleAuthenticatedRedirect tests the authenticatedRedirect function

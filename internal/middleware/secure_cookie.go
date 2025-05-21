@@ -30,13 +30,16 @@ func InitializeCookieSecret() {
 	// For a real application, you should use a stable secret from environment or config
 	// In this example, we'll generate a random secret if one doesn't exist
 	secret := make([]byte, 32) // 256 bits
+
 	_, err := rand.Read(secret)
 	if err != nil {
 		log.Printf("Warning: Failed to generate secure cookie secret: %v", err)
 		// Fallback to a fixed secret (not recommended for production)
 		secret = []byte("default-cookie-secret-please-change-me")
 	}
+
 	cookieSecret = secret
+
 	log.Println("Cookie signing secret initialized")
 }
 
@@ -52,7 +55,9 @@ func SetSecureSessionCookie(w http.ResponseWriter, email string) {
 
 	// Create HMAC signature
 	h := hmac.New(sha256.New, cookieSecret)
-	h.Write([]byte(payload))
+	if _, err := h.Write([]byte(payload)); err != nil {
+		log.Printf("Error creating HMAC signature: %v", err)
+	}
 	signature := h.Sum(nil)
 
 	// Encode the payload and signature for the cookie
@@ -109,7 +114,10 @@ func VerifySecureSessionCookie(r *http.Request) (string, bool) {
 
 	// Verify the signature
 	h := hmac.New(sha256.New, cookieSecret)
-	h.Write(payloadBytes)
+	if _, err := h.Write(payloadBytes); err != nil {
+		log.Printf("Error verifying signature: %v", err)
+		return "", false
+	}
 	expectedSignature := h.Sum(nil)
 
 	if !hmac.Equal(signatureBytes, expectedSignature) {
@@ -119,6 +127,7 @@ func VerifySecureSessionCookie(r *http.Request) (string, bool) {
 
 	// Parse the payload
 	payload := string(payloadBytes)
+
 	payloadParts := strings.Split(payload, "|")
 	if len(payloadParts) != 2 {
 		log.Printf("Invalid payload format")

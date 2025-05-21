@@ -1,6 +1,6 @@
 # Makefile for Pizzeria Project
 
-.PHONY: all build clean test run run-main air dev help
+.PHONY: all build clean test run run-main air dev help lint lint-fix
 
 # Configuration
 GO=go
@@ -35,6 +35,8 @@ help:
 	@echo "  make test-v     - Run tests with verbose output"
 	@echo "  make test-race  - Run tests with race detection"
 	@echo "  make test-cover - Run tests with coverage report"
+	@echo "  make lint       - Run golangci-lint (skips test files)"
+	@echo "  make lint-fix   - Run golangci-lint with auto-fix (skips test files)"
 
 # Build commands
 build: build-css build-go
@@ -86,6 +88,17 @@ test-cover:
 	$(GO) test -coverprofile=coverage.out $(PKG)/...
 	$(GO) tool cover -html=coverage.out -o coverage.html
 	@echo "$(GREEN)Coverage report generated at coverage.html$(NC)"
+
+# Lint commands
+lint:
+	@echo "Running golangci-lint..."
+	golangci-lint run
+	@echo "$(GREEN)Lint complete$(NC)"
+
+lint-fix:
+	@echo "Running golangci-lint with auto-fix..."
+	golangci-lint run --fix
+	@echo "$(GREEN)Lint and fix complete$(NC)"
 
 # Clean command
 clean:

@@ -34,9 +34,9 @@ func (m *Repository) adminError(w http.ResponseWriter, r *http.Request, err erro
 	// Check if user is authenticated and authorized (admin)
 	userEmail, valid := middleware.VerifySecureSessionCookie(r)
 	isAdmin := valid && m.OAuthConfig.IsAllowedEmail(userEmail)
-	
+
 	log.Printf("ERROR (%s): %v", source, err)
-	
+
 	if isAdmin {
 		// For admin users, show the actual error message
 		http.Error(w, fmt.Sprintf("Error in %s: %v", source, err), status)
