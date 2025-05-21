@@ -109,14 +109,7 @@ func main() {
 	mux.HandleFunc("/auth/google/login", handlers.Repo.HandleGoogleLogin)
 	mux.HandleFunc("/auth/google/callback", handlers.Repo.HandleGoogleCallback)
 
-	// Debug endpoints - only available in non-production environments
-	if !isProduction {
-		// Register debug endpoints
-		mux.HandleFunc("/debug/menu-items", handlers.Repo.DebugMenuItems)
-		mux.HandleFunc("/debug/db-check", handlers.Repo.CheckDBConnection)
-		mux.HandleFunc("/debug/image-test", handlers.Repo.TestImageOperations)
-		log.Println("Debug endpoints registered and available")
-	}
+	// Debug endpoints section removed as tests have been implemented
 
 	// Admin routes with custom handler that checks auth for all admin paths
 	mux.HandleFunc("/admin", authenticatedRedirect)
