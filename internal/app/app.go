@@ -93,8 +93,8 @@ func (app *Application) Close() {
 // SetupHandlers initializes the handlers
 func (app *Application) SetupHandlers() http.Handler {
 	// Initialize handlers
-	repo := handlers.NewRepo(app.DBModel, app.TemplateCache, app.OAuthConfig)
-	handlers.NewHandlers(repo)
+	appServices := handlers.NewAppServices(app.DBModel, app.TemplateCache, app.OAuthConfig)
+	handlers.NewHandlers(appServices)
 
 	// Create primary mux
 	mux := http.NewServeMux()
@@ -104,16 +104,16 @@ func (app *Application) SetupHandlers() http.Handler {
 	mux.Handle("/static/", http.StripPrefix("/static/", fs))
 
 	// Auth related routes
-	mux.HandleFunc("/login", handlers.Repo.ShowLoginPage)
-	mux.HandleFunc("/auth/google/login", handlers.Repo.HandleGoogleLogin)
-	mux.HandleFunc("/auth/google/callback", handlers.Repo.HandleGoogleCallback)
+	mux.HandleFunc("/login", handlers.Services.ShowLoginPage)
+	mux.HandleFunc("/auth/google/login", handlers.Services.HandleGoogleLogin)
+	mux.HandleFunc("/auth/google/callback", handlers.Services.HandleGoogleCallback)
 
 	// Admin routes with custom handler that checks auth for all admin paths
 	mux.HandleFunc("/admin", authenticatedRedirect)
 	mux.HandleFunc("/admin/", authenticatedAdmin)
 
 	// Home route MUST be registered LAST to avoid catching other routes
-	mux.HandleFunc("/", handlers.Repo.Home)
+	mux.HandleFunc("/", handlers.Services.Home)
 
 	return mux
 }
@@ -201,34 +201,34 @@ func authenticatedAdmin(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case path == "/admin/" || path == "/admin":
 		log.Println("Matched admin root path, calling AdminRoot handler")
-		handlers.Repo.AdminRoot(w, r)
+		handlers.Services.AdminRoot(w, r)
 
 	case path == "/admin/dashboard":
-		handlers.Repo.AdminDashboard(w, r)
+		handlers.Services.AdminDashboard(w, r)
 
 	case path == "/admin/menu/new":
-		handlers.Repo.ShowCreateMenuItem(w, r)
+		handlers.Services.ShowCreateMenuItem(w, r)
 
 	case path == "/admin/menu/create":
-		handlers.Repo.CreateMenuItem(w, r)
+		handlers.Services.CreateMenuItem(w, r)
 
 	case strings.HasPrefix(path, "/admin/menu/edit/"):
-		handlers.Repo.ShowEditMenuItem(w, r)
+		handlers.Services.ShowEditMenuItem(w, r)
 
 	case strings.HasPrefix(path, "/admin/menu/update/"):
-		handlers.Repo.UpdateMenuItem(w, r)
+		handlers.Services.UpdateMenuItem(w, r)
 
 	case strings.HasPrefix(path, "/admin/menu/delete/"):
-		handlers.Repo.DeleteMenuItem(w, r)
+		handlers.Services.DeleteMenuItem(w, r)
 
 	case path == "/admin/flash-message":
-		handlers.Repo.CreateFlashMessage(w, r)
+		handlers.Services.CreateFlashMessage(w, r)
 
 	case strings.HasPrefix(path, "/admin/flash-message/delete/"):
-		handlers.Repo.DeleteFlashMessage(w, r)
+		handlers.Services.DeleteFlashMessage(w, r)
 
 	case path == "/admin/logout":
-		handlers.Repo.HandleLogout(w, r)
+		handlers.Services.HandleLogout(w, r)
 
 	default:
 		log.Printf("404 Not Found for admin route: %s", path)

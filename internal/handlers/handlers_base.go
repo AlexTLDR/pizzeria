@@ -9,7 +9,7 @@ import (
 )
 
 // Home handles the home page
-func (m *Repository) Home(w http.ResponseWriter, _ *http.Request) {
+func (m *AppServices) Home(w http.ResponseWriter, _ *http.Request) {
 	// Use the model's method to get menu items - this properly handles NULL small_price values
 	log.Println("Fetching menu items using model's GetAllMenuItems method")
 

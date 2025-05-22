@@ -11,7 +11,7 @@ import (
 )
 
 // ShowGoogleLogin renders the Google login page
-func (m *Repository) ShowGoogleLogin(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) ShowGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	// Generate a random state parameter for CSRF protection
 	b := make([]byte, 16)
 
@@ -57,7 +57,7 @@ func (m *Repository) ShowGoogleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 // GoogleCallback handles the OAuth callback from Google
-func (m *Repository) GoogleCallback(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	// Verify state parameter from cookie
 	stateCookie, err := r.Cookie("oauth_state")
 	if err != nil {
@@ -125,7 +125,7 @@ func (m *Repository) GoogleCallback(w http.ResponseWriter, r *http.Request) {
 }
 
 // GoogleLogout handles user logout
-func (m *Repository) GoogleLogout(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) GoogleLogout(w http.ResponseWriter, r *http.Request) {
 	// Clear the session cookie
 	middleware.ClearSessionCookie(w)
 

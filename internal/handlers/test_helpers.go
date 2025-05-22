@@ -67,7 +67,7 @@ func createMockTemplates() map[string]*template.Template {
 	return templateCache
 }
 
-func NewTestRepo(t *testing.T) *Repository {
+func NewTestAppServices(t *testing.T) *AppServices {
 	templateCache := createMockTemplates()
 
 	db, err := createTestDB()
@@ -83,7 +83,7 @@ func NewTestRepo(t *testing.T) *Repository {
 		AllowedEmails: []string{"test@example.com", "admin@example.com"},
 	}
 
-	return &Repository{
+	return &AppServices{
 		DB:            testDBModel,
 		TemplateCache: templateCache,
 		OAuthConfig:   testOAuthConfig,
@@ -153,13 +153,13 @@ func CreateTestRequest(t *testing.T, method, url string, body io.Reader) (*http.
 	return req, rr
 }
 
-func CleanTestDB(repo *Repository) {
-	if repo != nil && repo.DB != nil && repo.DB.DB != nil {
+func CleanTestDB(services *AppServices) {
+	if services != nil && services.DB != nil && services.DB.DB != nil {
 		var dbPath string
 
-		err := repo.DB.DB.QueryRow("PRAGMA database_list").Scan(nil, &dbPath, nil)
+		err := services.DB.DB.QueryRow("PRAGMA database_list").Scan(nil, &dbPath, nil)
 		if err == nil && dbPath != "" {
-			if closeErr := repo.DB.DB.Close(); closeErr != nil {
+			if closeErr := services.DB.DB.Close(); closeErr != nil {
 				// In tests, we can just log the error
 				fmt.Printf("Error closing test database: %v\n", closeErr)
 			}

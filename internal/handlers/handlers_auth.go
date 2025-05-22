@@ -12,7 +12,7 @@ import (
 )
 
 // ShowLoginPage displays the login page
-func (m *Repository) ShowLoginPage(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) ShowLoginPage(w http.ResponseWriter, r *http.Request) {
 	// Check if there's an error message
 	errorMsg := r.URL.Query().Get("error")
 
@@ -31,7 +31,7 @@ func (m *Repository) ShowLoginPage(w http.ResponseWriter, r *http.Request) {
 }
 
 // HandleGoogleLogin initiates the Google OAuth login flow
-func (m *Repository) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	// Generate a random state token to protect against CSRF
 	state, err := generateStateToken()
 	if err != nil {
@@ -57,7 +57,7 @@ func (m *Repository) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 // HandleGoogleCallback processes the callback from Google OAuth
-func (m *Repository) HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
 	// Get the state from the URL
 	state := r.URL.Query().Get("state")
 	if state == "" {
@@ -140,7 +140,7 @@ func (m *Repository) HandleGoogleCallback(w http.ResponseWriter, r *http.Request
 }
 
 // HandleLogout logs the user out
-func (m *Repository) HandleLogout(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	// Clear the session cookie
 	middleware.ClearSessionCookie(w)
 

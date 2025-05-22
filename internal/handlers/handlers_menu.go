@@ -17,7 +17,7 @@ import (
 )
 
 // deleteImageFile safely deletes an image file
-func (m *Repository) deleteImageFile(imageURL string) {
+func (m *AppServices) deleteImageFile(imageURL string) {
 	// Skip if empty URL
 	if imageURL == "" {
 		return
@@ -52,7 +52,7 @@ func (m *Repository) deleteImageFile(imageURL string) {
 }
 
 // ShowCreateMenuItem displays the create menu item form
-func (m *Repository) ShowCreateMenuItem(w http.ResponseWriter, _ *http.Request) {
+func (m *AppServices) ShowCreateMenuItem(w http.ResponseWriter, _ *http.Request) {
 	// Render the menu form template
 	err := m.TemplateCache["menu-form.html"].Execute(w, map[string]interface{}{
 		"Title":    "Create Menu Item",
@@ -68,7 +68,7 @@ func (m *Repository) ShowCreateMenuItem(w http.ResponseWriter, _ *http.Request) 
 }
 
 // ShowEditMenuItem displays the edit menu item form
-func (m *Repository) ShowEditMenuItem(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) ShowEditMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL
 	id := r.URL.Path[len("/admin/menu/edit/"):]
 
@@ -101,7 +101,7 @@ func (m *Repository) ShowEditMenuItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // isValidImageExtension checks if the file has an allowed image extension
-func (m *Repository) isValidImageExtension(filename string) bool {
+func (m *AppServices) isValidImageExtension(filename string) bool {
 	extension := strings.ToLower(filepath.Ext(filename))
 
 	// Define allowed image extensions
@@ -119,7 +119,7 @@ func (m *Repository) isValidImageExtension(filename string) bool {
 }
 
 // CreateMenuItem handles the create menu item form submission
-func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Check if this is a GET request - if so, show the form instead of processing it
 	if r.Method == "GET" {
 		m.ShowCreateMenuItem(w, r)
@@ -234,7 +234,7 @@ func (m *Repository) CreateMenuItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // UpdateMenuItem handles the update menu item form submission
-func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL
 	id := r.URL.Path[len("/admin/menu/update/"):]
 
@@ -386,7 +386,7 @@ func (m *Repository) UpdateMenuItem(w http.ResponseWriter, r *http.Request) {
 }
 
 // DeleteMenuItem handles the deletion of a menu item
-func (m *Repository) DeleteMenuItem(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) DeleteMenuItem(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL
 	id := r.URL.Path[len("/admin/menu/delete/"):]
 

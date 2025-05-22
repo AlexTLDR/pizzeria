@@ -8,15 +8,15 @@ import (
 	_ "github.com/mattn/go-sqlite3" // Required for test database
 )
 
-func TestRepository_Home(t *testing.T) {
-	repo := NewTestRepo(t)
-	defer CleanTestDB(repo)
+func TestAppServices_Home(t *testing.T) {
+	services := NewTestAppServices(t)
+	defer CleanTestDB(services)
 
-	NewHandlers(repo)
+	NewHandlers(services)
 
 	req, rr := CreateTestRequest(t, "GET", "/", nil)
 
-	http.HandlerFunc(Repo.Home).ServeHTTP(rr, req)
+	http.HandlerFunc(Services.Home).ServeHTTP(rr, req)
 
 	if status := rr.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
@@ -27,5 +27,5 @@ func TestRepository_Home(t *testing.T) {
 	}
 }
 
-// TestRepository_CheckDBConnection has been removed as the debug function 
+// TestAppServices_CheckDBConnection has been removed as the debug function 
 // is no longer needed

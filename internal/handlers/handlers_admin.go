@@ -11,7 +11,7 @@ import (
 )
 
 // AdminDashboard displays the admin dashboard
-func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	// Direct SQL query as a fallback/temporary solution
 	log.Println("Querying menu items directly from DB in AdminDashboard handler")
 
@@ -75,7 +75,7 @@ func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreateFlashMessage handles creation of flash messages
-func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) CreateFlashMessage(w http.ResponseWriter, r *http.Request) {
 	// Parse form data
 	err := r.ParseForm()
 	if err != nil {
@@ -147,7 +147,7 @@ func (m *Repository) CreateFlashMessage(w http.ResponseWriter, r *http.Request) 
 }
 
 // DeleteFlashMessage handles deletion of flash messages
-func (m *Repository) DeleteFlashMessage(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) DeleteFlashMessage(w http.ResponseWriter, r *http.Request) {
 	// Extract ID from URL
 	idStr := r.URL.Path[len("/admin/flash-message/delete/"):]
 
@@ -169,6 +169,6 @@ func (m *Repository) DeleteFlashMessage(w http.ResponseWriter, r *http.Request) 
 }
 
 // AdminRoot redirects from /admin to /admin/dashboard
-func (m *Repository) AdminRoot(w http.ResponseWriter, r *http.Request) {
+func (m *AppServices) AdminRoot(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/dashboard", http.StatusSeeOther)
 }
