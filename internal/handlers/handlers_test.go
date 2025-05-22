@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	_ "github.com/mattn/go-sqlite3" // Required for test database
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func TestAppServices_Home(t *testing.T) {
@@ -26,6 +26,3 @@ func TestAppServices_Home(t *testing.T) {
 		t.Errorf("handler response doesn't contain expected mock template content")
 	}
 }
-
-// TestAppServices_CheckDBConnection has been removed as the debug function 
-// is no longer needed

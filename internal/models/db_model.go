@@ -20,7 +20,3 @@ type User struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
-
-// Note: All the methods for MenuItem and FlashMessage have been moved to their respective files.
-// The User struct is kept here for reference but its methods are commented out in the original file
-// and are not included here.

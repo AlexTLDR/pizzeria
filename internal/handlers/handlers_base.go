@@ -8,6 +8,15 @@ import (
 	"github.com/AlexTLDR/pizzeria/internal/models"
 )
 
+// categorySimplifier maps full bilingual categories to simplified Italian-only versions
+var categorySimplifier = map[string]string{
+	"Antipasti / Vorspeisen":                   "Antipasti",
+	"Insalate / Salate":                        "Insalate",
+	"Carne / Fleisch":                          "Carne",
+	"Pesce Fritto / Fisch fritiert":            "Pesce Fritto",
+	"Pasta al Forno / Nudelgerichte überbacken": "Pasta al Forno",
+}
+
 // Home handles the home page
 func (m *AppServices) Home(w http.ResponseWriter, _ *http.Request) {
 	// Use the model's method to get menu items - this properly handles NULL small_price values
@@ -43,21 +52,9 @@ func (m *AppServices) Home(w http.ResponseWriter, _ *http.Request) {
 		// Clone the item for modification
 		simplifiedItem := item
 
-		// Simplified category name for template conditionals
-		var simpleCategory string
-
-		// Extract simpler category name from database category
-		if item.Category == "Antipasti / Vorspeisen" {
-			simpleCategory = "Antipasti"
-		} else if item.Category == "Insalate / Salate" {
-			simpleCategory = "Insalate"
-		} else if item.Category == "Carne / Fleisch" {
-			simpleCategory = "Carne"
-		} else if item.Category == "Pesce Fritto / Fisch fritiert" {
-			simpleCategory = "Pesce Fritto"
-		} else if item.Category == "Pasta al Forno / Nudelgerichte überbacken" {
-			simpleCategory = "Pasta al Forno"
-		} else {
+		// Get simplified category using the map with fallback to original
+		simpleCategory, exists := categorySimplifier[item.Category]
+		if !exists {
 			// For categories that don't need renaming (Pizza, Spaghetti, Penne, Rigatoni)
 			simpleCategory = item.Category
 		}
