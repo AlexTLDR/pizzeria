@@ -10,6 +10,11 @@ RUN go mod download
 # Copy source code
 COPY . .
 
+# Install Node.js and build CSS
+RUN apk add --no-cache nodejs npm
+RUN npm install
+RUN npm run build-css
+
 # Install build dependencies for CGO and build the Go app
 RUN apk add --no-cache gcc musl-dev \
  && CGO_ENABLED=1 GOOS=linux go build -o server ./cmd/server
