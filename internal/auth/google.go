@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/joho/godotenv"
@@ -30,9 +31,12 @@ type GoogleUserInfo struct {
 
 // Initialize loads OAuth configuration from environment
 func Initialize() (*OAuthConfig, error) {
-	// Load .env file
+	// Try to load .env file, but don't fail if it doesn't exist
+	// (environment variables might be set via docker-compose or system)
 	if err := godotenv.Load(); err != nil {
-		return nil, fmt.Errorf("error loading .env file: %w", err)
+		// This is normal in Docker environments where env vars are set directly
+		// Just log a debug message but don't fail
+		fmt.Printf("Info: .env file not found (using environment variables): %v\n", err)
 	}
 
 	// Get Google OAuth credentials
@@ -41,7 +45,7 @@ func Initialize() (*OAuthConfig, error) {
 	redirectURL := os.Getenv("GOOGLE_REDIRECT_URL")
 
 	if clientID == "" || clientSecret == "" || redirectURL == "" {
-		return nil, errors.New("missing Google OAuth configuration in .env file")
+		return nil, errors.New("missing Google OAuth configuration - ensure GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and GOOGLE_REDIRECT_URL environment variables are set")
 	}
 
 	// Get allowed emails
@@ -53,7 +57,7 @@ func Initialize() (*OAuthConfig, error) {
 	}
 
 	if len(allowedEmails) == 0 || (len(allowedEmails) == 1 && allowedEmails[0] == "") {
-		return nil, errors.New("no allowed email addresses configured in .env file")
+		return nil, errors.New("no allowed email addresses configured - ensure ALLOWED_EMAILS environment variable is set")
 	}
 
 	// Create OAuth config
@@ -105,13 +109,7 @@ func (c *OAuthConfig) GetUserInfo(token *oauth2.Token) (*GoogleUserInfo, error) 
 
 // IsAllowedEmail checks if the email is in the allowed list
 func (c *OAuthConfig) IsAllowedEmail(email string) bool {
-	for _, allowedEmail := range c.AllowedEmails {
-		if email == allowedEmail {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(c.AllowedEmails, email)
 }
 
 // ExchangeCodeForToken exchanges an authorization code for an OAuth token
