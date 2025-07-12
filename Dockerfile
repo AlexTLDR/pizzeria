@@ -17,7 +17,7 @@ RUN npm run build-css
 
 # Install build dependencies for CGO and build the Go app
 RUN apk add --no-cache gcc musl-dev \
- && CGO_ENABLED=1 GOOS=linux go build -o server ./cmd/server
+    && CGO_ENABLED=1 GOOS=linux go build -o server ./cmd/server
 
 # Final stage
 FROM alpine:latest
@@ -27,8 +27,7 @@ WORKDIR /app
 # Copy the built binary
 COPY --from=builder /app/server .
 
-# Copy .env and db directory
-COPY --from=builder /app/.env ./
+# Copy db directory
 COPY --from=builder /app/db ./db
 
 # Copy templates and static assets
