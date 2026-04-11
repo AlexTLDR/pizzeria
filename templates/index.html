@@ -27,32 +27,32 @@
          }
       </style>
    </head>
-   <body class="min-h-screen relative">
+   <body class="relative min-h-screen">
       <!-- Gradient Background -->
       <div class="gradient-background fixed inset-0 -z-10"></div>
       {{ template "header" . }}
       <main>
          <!-- Static Announcement Banner -->
-         <section class="py-6 bg-transparent">
+         <section class="bg-transparent py-6">
             <div class="container mx-auto px-6 text-center">
-               <h2 class="text-2xl font-display font-bold text-black">Dienstag Pizza Tag!</h2>
+               <h2 class="font-display text-2xl font-bold text-black">Dienstag Pizza Tag!</h2>
                <p class="mt-2 text-black">
                   Auf unserer Speisekarte stehen am Dienstag
-                  nur Pizzen und Salate.
+                  nur Pizzen und Salate!
                </p>
             </div>
          </section>
          <!-- HIGHLY VISIBLE ANNOUNCEMENTS -->
          {{ range .FlashMessages }}
-         <section class="py-6 flash-message" data-id="{{ .ID }}">
+         <section class="flash-message py-6" data-id="{{ .ID }}">
             <div class="container mx-auto px-4">
-               <div class="bg-gray-800 rounded-xl shadow-lg overflow-hidden border-2 border-pizza-red relative">
+               <div class="relative overflow-hidden rounded-xl border-2 border-pizza-red bg-gray-800 shadow-lg">
                   <div class="p-4">
                      <!-- Title with inline close button -->
-                     <div class="flex items-center justify-between mb-2">
+                     <div class="mb-2 flex items-center justify-between">
                         <h3 class="text-xl font-bold text-white">Neuigkeiten</h3>
                         <!-- Basic button with minimal styling -->
-                        <button type="button" class="flash-close-btn inline-block bg-red-600 text-white rounded-full p-1.5" aria-label="Close">
+                        <button type="button" class="flash-close-btn inline-block rounded-full bg-red-600 p-1.5 text-white" aria-label="Close">
                         X
                         </button>
                      </div>
@@ -66,21 +66,21 @@
          <div class="spacer-32"></div>
          {{ template "category-nav" . }}
          <!-- Menu Section -->
-         <section class="py-12 bg-transparent">
+         <section class="bg-transparent py-12">
             <div class="container mx-auto px-6">
-               <h2 class="text-3xl font-display font-bold text-center mb-8">Unsere Speisekarte</h2>
+               <h2 class="mb-8 text-center font-display text-3xl font-bold">Unsere Speisekarte</h2>
                <!-- Menu Categories -->
                <div id="antipasti" class="mb-12 pt-4">
-                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Antipasti / Vorspeisen</h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <h2 class="mb-6 border-b-2 border-pizza-red pb-2 font-display text-2xl font-bold">Antipasti / Vorspeisen</h2>
+                  <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                      {{ range .Menu }}
                      {{ if eq .Category "Antipasti" }}
-                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                     <div class="menu-item overflow-hidden rounded-lg bg-gray-800 shadow-md">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="h-48 w-full object-cover">
                         <div class="p-4">
-                           <div class="flex justify-between items-center mb-2">
+                           <div class="mb-2 flex items-center justify-between">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                              <span class="font-bold text-white">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -90,16 +90,16 @@
                   </div>
                </div>
                <div id="insalate" class="mb-12 pt-4">
-                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Insalate / Salate</h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <h2 class="mb-6 border-b-2 border-pizza-red pb-2 font-display text-2xl font-bold">Insalate / Salate</h2>
+                  <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                      {{ range .Menu }}
                      {{ if eq .Category "Insalate" }}
-                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                     <div class="menu-item overflow-hidden rounded-lg bg-gray-800 shadow-md">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="h-48 w-full object-cover">
                         <div class="p-4">
-                           <div class="flex justify-between items-center mb-2">
+                           <div class="mb-2 flex items-center justify-between">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                              <span class="font-bold text-white">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -129,7 +129,7 @@
                   </style>
                   <!-- Single heading with responsive size descriptions -->
                   <div class="mb-6 border-b-2 border-pizza-red pb-2">
-                     <h2 class="text-2xl font-display font-bold">Pizza</h2>
+                     <h2 class="font-display text-2xl font-bold">Pizza</h2>
                      <!-- Mobile size text -->
                      <div class="mobile-size-info mt-1">
                         <h3 class="text-base font-medium text-black">26 cm ⌀ (klein) | 32 cm ⌀ (normal)</h3>
@@ -139,15 +139,15 @@
                         <h3 class="text-base font-medium text-black">Größen: klein ca. 26cm | normal ca. 32cm ⌀</h3>
                      </div>
                   </div>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                      {{ range .Menu }}
                      {{ if eq .Category "Pizza" }}
-                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                     <div class="menu-item overflow-hidden rounded-lg bg-gray-800 shadow-md">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="h-48 w-full object-cover">
                         <div class="p-4">
-                           <div class="flex justify-between items-start mb-2">
+                           <div class="mb-2 flex items-start justify-between">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <div class="text-right text-white font-bold">
+                              <div class="text-right font-bold text-white">
                                  {{ if .SmallPrice }}
                                  <!-- Mobile: Stacked prices -->
                                  <div class="flex flex-col md:hidden">
@@ -172,16 +172,16 @@
                   </div>
                </div>
                <div id="spaghetti" class="mb-12 pt-4">
-                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Spaghetti</h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <h2 class="mb-6 border-b-2 border-pizza-red pb-2 font-display text-2xl font-bold">Spaghetti</h2>
+                  <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                      {{ range .Menu }}
                      {{ if eq .Category "Spaghetti" }}
-                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                     <div class="menu-item overflow-hidden rounded-lg bg-gray-800 shadow-md">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="h-48 w-full object-cover">
                         <div class="p-4">
-                           <div class="flex justify-between items-center mb-2">
+                           <div class="mb-2 flex items-center justify-between">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                              <span class="font-bold text-white">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -191,16 +191,16 @@
                   </div>
                </div>
                <div id="penne" class="mb-12 pt-4">
-                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Penne</h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <h2 class="mb-6 border-b-2 border-pizza-red pb-2 font-display text-2xl font-bold">Penne</h2>
+                  <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                      {{ range .Menu }}
                      {{ if eq .Category "Penne" }}
-                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                     <div class="menu-item overflow-hidden rounded-lg bg-gray-800 shadow-md">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="h-48 w-full object-cover">
                         <div class="p-4">
-                           <div class="flex justify-between items-center mb-2">
+                           <div class="mb-2 flex items-center justify-between">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                              <span class="font-bold text-white">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -210,16 +210,16 @@
                   </div>
                </div>
                <div id="rigatoni" class="mb-12 pt-4">
-                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Rigatoni</h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <h2 class="mb-6 border-b-2 border-pizza-red pb-2 font-display text-2xl font-bold">Rigatoni</h2>
+                  <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                      {{ range .Menu }}
                      {{ if eq .Category "Rigatoni" }}
-                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                     <div class="menu-item overflow-hidden rounded-lg bg-gray-800 shadow-md">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="h-48 w-full object-cover">
                         <div class="p-4">
-                           <div class="flex justify-between items-center mb-2">
+                           <div class="mb-2 flex items-center justify-between">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                              <span class="font-bold text-white">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -229,16 +229,16 @@
                   </div>
                </div>
                <div id="pasta-al-forno" class="mb-12 pt-4">
-                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pasta al Forno / Nudelgerichte überbacken</h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <h2 class="mb-6 border-b-2 border-pizza-red pb-2 font-display text-2xl font-bold">Pasta al Forno / Nudelgerichte überbacken</h2>
+                  <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                      {{ range .Menu }}
                      {{ if eq .Category "Pasta al Forno" }}
-                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                     <div class="menu-item overflow-hidden rounded-lg bg-gray-800 shadow-md">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="h-48 w-full object-cover">
                         <div class="p-4">
-                           <div class="flex justify-between items-center mb-2">
+                           <div class="mb-2 flex items-center justify-between">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                              <span class="font-bold text-white">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -248,16 +248,16 @@
                   </div>
                </div>
                <div id="pesce" class="mb-12 pt-4">
-                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Pesce Fritto / Fisch fritiert</h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <h2 class="mb-6 border-b-2 border-pizza-red pb-2 font-display text-2xl font-bold">Pesce Fritto / Fisch fritiert</h2>
+                  <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                      {{ range .Menu }}
                      {{ if eq .Category "Pesce Fritto" }}
-                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                     <div class="menu-item overflow-hidden rounded-lg bg-gray-800 shadow-md">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="h-48 w-full object-cover">
                         <div class="p-4">
-                           <div class="flex justify-between items-center mb-2">
+                           <div class="mb-2 flex items-center justify-between">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                              <span class="font-bold text-white">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
@@ -267,16 +267,16 @@
                   </div>
                </div>
                <div id="carne" class="mb-12 pt-4">
-                  <h2 class="text-2xl font-display font-bold mb-6 border-b-2 border-pizza-red pb-2">Carne / Fleisch</h2>
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <h2 class="mb-6 border-b-2 border-pizza-red pb-2 font-display text-2xl font-bold">Carne / Fleisch</h2>
+                  <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                      {{ range .Menu }}
                      {{ if eq .Category "Carne" }}
-                     <div class="menu-item bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="w-full h-48 object-cover">
+                     <div class="menu-item overflow-hidden rounded-lg bg-gray-800 shadow-md">
+                        <img src="{{ .ImageURL }}" alt="{{ .Name }}" class="h-48 w-full object-cover">
                         <div class="p-4">
-                           <div class="flex justify-between items-center mb-2">
+                           <div class="mb-2 flex items-center justify-between">
                               <h3 class="text-xl font-bold text-white">{{ .Name }}</h3>
-                              <span class="text-white font-bold">€{{ printf "%.2f" .Price }}</span>
+                              <span class="font-bold text-white">€{{ printf "%.2f" .Price }}</span>
                            </div>
                            <p class="text-white">{{ .Description }}</p>
                         </div>
